@@ -1,0 +1,43 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev,app]"
+      - run: ruff check src tests app
+      - run: pytest -m "not slow"
+      - name: App smoke test
+        run: |
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+          for page in ("app/streamlit_app.py", "app/views/spc_toolkit.py", "app/views/decision_studio.py"):
+              at = AppTest.from_file(page, default_timeout=120)
+              at.run()
+              assert not at.exception, (page, at.exception)
+          at = AppTest.from_file("app/views/decision_studio.py", default_timeout=300)
+          at.run()
+          next(b for b in at.button if "Simulate" in b.label).click().run()
+          assert not at.exception, at.exception
+          PY
+
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e ".[dev]"
+      - run: pytest -m slow

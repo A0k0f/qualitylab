@@ -1,0 +1,925 @@
+complaint,date,complaint_reason
+1,2026-07-01,Late delivery
+2,2026-07-01,Website checkout bug
+3,2026-07-01,Wrong item shipped
+4,2026-07-01,Damaged packaging
+5,2026-07-01,Damaged packaging
+6,2026-07-01,Late delivery
+7,2026-07-01,Wrong item shipped
+8,2026-07-01,Late delivery
+9,2026-07-01,Billing error
+10,2026-07-01,Website checkout bug
+11,2026-07-01,Damaged packaging
+12,2026-07-01,Wrong item shipped
+13,2026-07-01,Late delivery
+14,2026-07-02,Late delivery
+15,2026-07-02,Billing error
+16,2026-07-02,Late delivery
+17,2026-07-02,Damaged packaging
+18,2026-07-02,Billing error
+19,2026-07-02,Billing error
+20,2026-07-02,Billing error
+21,2026-07-03,Wrong item shipped
+22,2026-07-03,Wrong item shipped
+23,2026-07-03,Late delivery
+24,2026-07-03,Late delivery
+25,2026-07-03,Late delivery
+26,2026-07-03,Late delivery
+27,2026-07-03,Billing error
+28,2026-07-03,Damaged packaging
+29,2026-07-03,Wrong item shipped
+30,2026-07-03,Wrong item shipped
+31,2026-07-03,Late delivery
+32,2026-07-03,Damaged packaging
+33,2026-07-03,Late delivery
+34,2026-07-03,Billing error
+35,2026-07-03,Late delivery
+36,2026-07-03,Billing error
+37,2026-07-03,Wrong item shipped
+38,2026-07-03,Wrong item shipped
+39,2026-07-03,Late delivery
+40,2026-07-03,Late delivery
+41,2026-07-04,Billing error
+42,2026-07-04,Damaged packaging
+43,2026-07-04,Rude support agent
+44,2026-07-04,Wrong item shipped
+45,2026-07-04,Wrong item shipped
+46,2026-07-04,Late delivery
+47,2026-07-04,Damaged packaging
+48,2026-07-04,Late delivery
+49,2026-07-04,Wrong item shipped
+50,2026-07-04,Billing error
+51,2026-07-04,Wrong item shipped
+52,2026-07-04,Damaged packaging
+53,2026-07-05,Late delivery
+54,2026-07-05,Website checkout bug
+55,2026-07-05,Late delivery
+56,2026-07-05,Late delivery
+57,2026-07-05,Billing error
+58,2026-07-05,Late delivery
+59,2026-07-06,Wrong item shipped
+60,2026-07-06,Rude support agent
+61,2026-07-06,Wrong item shipped
+62,2026-07-06,Late delivery
+63,2026-07-06,Rude support agent
+64,2026-07-07,Billing error
+65,2026-07-07,Late delivery
+66,2026-07-07,Damaged packaging
+67,2026-07-07,Damaged packaging
+68,2026-07-07,Damaged packaging
+69,2026-07-07,Wrong item shipped
+70,2026-07-07,Website checkout bug
+71,2026-07-07,Late delivery
+72,2026-07-07,Late delivery
+73,2026-07-07,Late delivery
+74,2026-07-07,Late delivery
+75,2026-07-07,Damaged packaging
+76,2026-07-07,Damaged packaging
+77,2026-07-07,Late delivery
+78,2026-07-08,Wrong item shipped
+79,2026-07-08,Billing error
+80,2026-07-08,Damaged packaging
+81,2026-07-08,Wrong item shipped
+82,2026-07-08,Late delivery
+83,2026-07-08,Late delivery
+84,2026-07-08,Damaged packaging
+85,2026-07-08,Website checkout bug
+86,2026-07-08,Wrong item shipped
+87,2026-07-08,Late delivery
+88,2026-07-08,Website checkout bug
+89,2026-07-08,Damaged packaging
+90,2026-07-08,Late delivery
+91,2026-07-08,Damaged packaging
+92,2026-07-08,Late delivery
+93,2026-07-08,Billing error
+94,2026-07-09,Wrong item shipped
+95,2026-07-09,Late delivery
+96,2026-07-09,Missing parts
+97,2026-07-09,Damaged packaging
+98,2026-07-09,Rude support agent
+99,2026-07-09,Wrong item shipped
+100,2026-07-09,Late delivery
+101,2026-07-10,Damaged packaging
+102,2026-07-10,Damaged packaging
+103,2026-07-10,Late delivery
+104,2026-07-10,Wrong item shipped
+105,2026-07-10,Billing error
+106,2026-07-10,Billing error
+107,2026-07-10,Billing error
+108,2026-07-10,Late delivery
+109,2026-07-10,Damaged packaging
+110,2026-07-10,Wrong item shipped
+111,2026-07-10,Billing error
+112,2026-07-10,Rude support agent
+113,2026-07-10,Wrong item shipped
+114,2026-07-11,Damaged packaging
+115,2026-07-11,Damaged packaging
+116,2026-07-11,Damaged packaging
+117,2026-07-11,Billing error
+118,2026-07-11,Damaged packaging
+119,2026-07-11,Wrong item shipped
+120,2026-07-11,Damaged packaging
+121,2026-07-11,Wrong item shipped
+122,2026-07-11,Billing error
+123,2026-07-11,Rude support agent
+124,2026-07-12,Billing error
+125,2026-07-12,Rude support agent
+126,2026-07-12,Rude support agent
+127,2026-07-12,Billing error
+128,2026-07-12,Damaged packaging
+129,2026-07-12,Late delivery
+130,2026-07-12,Rude support agent
+131,2026-07-12,Late delivery
+132,2026-07-12,Late delivery
+133,2026-07-12,Late delivery
+134,2026-07-12,Late delivery
+135,2026-07-12,Damaged packaging
+136,2026-07-13,Damaged packaging
+137,2026-07-13,Late delivery
+138,2026-07-13,Billing error
+139,2026-07-13,Billing error
+140,2026-07-13,Wrong item shipped
+141,2026-07-13,Website checkout bug
+142,2026-07-13,Late delivery
+143,2026-07-13,Billing error
+144,2026-07-13,Wrong item shipped
+145,2026-07-14,Late delivery
+146,2026-07-14,Website checkout bug
+147,2026-07-14,Late delivery
+148,2026-07-14,Website checkout bug
+149,2026-07-14,Damaged packaging
+150,2026-07-14,Late delivery
+151,2026-07-14,Billing error
+152,2026-07-14,Late delivery
+153,2026-07-15,Website checkout bug
+154,2026-07-15,Late delivery
+155,2026-07-15,Damaged packaging
+156,2026-07-15,Late delivery
+157,2026-07-15,Rude support agent
+158,2026-07-15,Damaged packaging
+159,2026-07-15,Website checkout bug
+160,2026-07-15,Damaged packaging
+161,2026-07-15,Wrong item shipped
+162,2026-07-15,Damaged packaging
+163,2026-07-15,Late delivery
+164,2026-07-15,Billing error
+165,2026-07-15,Late delivery
+166,2026-07-15,Wrong item shipped
+167,2026-07-15,Wrong item shipped
+168,2026-07-16,Hard-to-read instructions
+169,2026-07-16,Late delivery
+170,2026-07-16,Wrong item shipped
+171,2026-07-16,Wrong item shipped
+172,2026-07-16,Website checkout bug
+173,2026-07-16,Late delivery
+174,2026-07-16,Late delivery
+175,2026-07-16,Missing parts
+176,2026-07-16,Wrong item shipped
+177,2026-07-16,Late delivery
+178,2026-07-17,Late delivery
+179,2026-07-17,Wrong item shipped
+180,2026-07-17,Wrong item shipped
+181,2026-07-17,Late delivery
+182,2026-07-17,Damaged packaging
+183,2026-07-17,Late delivery
+184,2026-07-17,Late delivery
+185,2026-07-17,Late delivery
+186,2026-07-17,Wrong item shipped
+187,2026-07-18,Late delivery
+188,2026-07-18,Billing error
+189,2026-07-18,Late delivery
+190,2026-07-18,Damaged packaging
+191,2026-07-18,Late delivery
+192,2026-07-18,Missing parts
+193,2026-07-18,Other
+194,2026-07-18,Wrong item shipped
+195,2026-07-18,Late delivery
+196,2026-07-18,Late delivery
+197,2026-07-18,Damaged packaging
+198,2026-07-19,Wrong item shipped
+199,2026-07-19,Missing parts
+200,2026-07-19,Damaged packaging
+201,2026-07-19,Late delivery
+202,2026-07-19,Late delivery
+203,2026-07-19,Late delivery
+204,2026-07-19,Missing parts
+205,2026-07-19,Other
+206,2026-07-19,Wrong item shipped
+207,2026-07-19,Damaged packaging
+208,2026-07-19,Wrong item shipped
+209,2026-07-19,Billing error
+210,2026-07-19,Missing parts
+211,2026-07-19,Billing error
+212,2026-07-20,Late delivery
+213,2026-07-20,Damaged packaging
+214,2026-07-20,Damaged packaging
+215,2026-07-20,Late delivery
+216,2026-07-20,Wrong item shipped
+217,2026-07-20,Late delivery
+218,2026-07-20,Rude support agent
+219,2026-07-20,Wrong item shipped
+220,2026-07-20,Late delivery
+221,2026-07-20,Late delivery
+222,2026-07-20,Late delivery
+223,2026-07-20,Website checkout bug
+224,2026-07-21,Wrong item shipped
+225,2026-07-21,Wrong item shipped
+226,2026-07-21,Late delivery
+227,2026-07-21,Late delivery
+228,2026-07-21,Wrong item shipped
+229,2026-07-21,Wrong item shipped
+230,2026-07-21,Billing error
+231,2026-07-21,Late delivery
+232,2026-07-22,Late delivery
+233,2026-07-22,Damaged packaging
+234,2026-07-22,Other
+235,2026-07-22,Wrong item shipped
+236,2026-07-22,Late delivery
+237,2026-07-22,Wrong item shipped
+238,2026-07-22,Wrong item shipped
+239,2026-07-22,Late delivery
+240,2026-07-22,Damaged packaging
+241,2026-07-22,Late delivery
+242,2026-07-22,Wrong item shipped
+243,2026-07-23,Billing error
+244,2026-07-23,Billing error
+245,2026-07-23,Late delivery
+246,2026-07-23,Late delivery
+247,2026-07-23,Wrong item shipped
+248,2026-07-23,Damaged packaging
+249,2026-07-23,Billing error
+250,2026-07-23,Damaged packaging
+251,2026-07-24,Late delivery
+252,2026-07-24,Wrong item shipped
+253,2026-07-24,Wrong item shipped
+254,2026-07-24,Damaged packaging
+255,2026-07-24,Rude support agent
+256,2026-07-24,Wrong item shipped
+257,2026-07-24,Late delivery
+258,2026-07-24,Billing error
+259,2026-07-24,Billing error
+260,2026-07-24,Late delivery
+261,2026-07-24,Late delivery
+262,2026-07-24,Late delivery
+263,2026-07-24,Damaged packaging
+264,2026-07-24,Billing error
+265,2026-07-24,Damaged packaging
+266,2026-07-24,Late delivery
+267,2026-07-24,Missing parts
+268,2026-07-25,Late delivery
+269,2026-07-25,Late delivery
+270,2026-07-25,Late delivery
+271,2026-07-25,Damaged packaging
+272,2026-07-25,Wrong item shipped
+273,2026-07-26,Wrong item shipped
+274,2026-07-26,Rude support agent
+275,2026-07-26,Wrong item shipped
+276,2026-07-26,Late delivery
+277,2026-07-26,Billing error
+278,2026-07-26,Rude support agent
+279,2026-07-26,Late delivery
+280,2026-07-26,Rude support agent
+281,2026-07-26,Late delivery
+282,2026-07-26,Website checkout bug
+283,2026-07-26,Late delivery
+284,2026-07-27,Damaged packaging
+285,2026-07-27,Other
+286,2026-07-27,Rude support agent
+287,2026-07-27,Missing parts
+288,2026-07-27,Damaged packaging
+289,2026-07-27,Damaged packaging
+290,2026-07-27,Late delivery
+291,2026-07-27,Damaged packaging
+292,2026-07-27,Damaged packaging
+293,2026-07-27,Billing error
+294,2026-07-27,Rude support agent
+295,2026-07-27,Hard-to-read instructions
+296,2026-07-27,Late delivery
+297,2026-07-27,Website checkout bug
+298,2026-07-27,Late delivery
+299,2026-07-28,Late delivery
+300,2026-07-28,Late delivery
+301,2026-07-28,Late delivery
+302,2026-07-28,Billing error
+303,2026-07-28,Late delivery
+304,2026-07-28,Late delivery
+305,2026-07-28,Website checkout bug
+306,2026-07-28,Wrong item shipped
+307,2026-07-28,Wrong item shipped
+308,2026-07-28,Damaged packaging
+309,2026-07-29,Late delivery
+310,2026-07-29,Damaged packaging
+311,2026-07-29,Website checkout bug
+312,2026-07-29,Damaged packaging
+313,2026-07-29,Damaged packaging
+314,2026-07-29,Damaged packaging
+315,2026-07-29,Damaged packaging
+316,2026-07-29,Late delivery
+317,2026-07-30,Late delivery
+318,2026-07-30,Wrong item shipped
+319,2026-07-30,Late delivery
+320,2026-07-30,Late delivery
+321,2026-07-30,Damaged packaging
+322,2026-07-30,Wrong item shipped
+323,2026-07-30,Late delivery
+324,2026-07-30,Late delivery
+325,2026-07-30,Late delivery
+326,2026-07-30,Late delivery
+327,2026-07-30,Late delivery
+328,2026-07-30,Late delivery
+329,2026-07-30,Rude support agent
+330,2026-07-30,Wrong item shipped
+331,2026-07-30,Rude support agent
+332,2026-07-30,Late delivery
+333,2026-07-30,Hard-to-read instructions
+334,2026-07-31,Website checkout bug
+335,2026-07-31,Missing parts
+336,2026-07-31,Late delivery
+337,2026-07-31,Damaged packaging
+338,2026-07-31,Late delivery
+339,2026-07-31,Billing error
+340,2026-07-31,Late delivery
+341,2026-07-31,Late delivery
+342,2026-07-31,Damaged packaging
+343,2026-07-31,Website checkout bug
+344,2026-07-31,Wrong item shipped
+345,2026-07-31,Damaged packaging
+346,2026-07-31,Wrong item shipped
+347,2026-07-31,Late delivery
+348,2026-08-01,Wrong item shipped
+349,2026-08-01,Wrong item shipped
+350,2026-08-01,Late delivery
+351,2026-08-01,Wrong item shipped
+352,2026-08-01,Late delivery
+353,2026-08-01,Damaged packaging
+354,2026-08-01,Late delivery
+355,2026-08-01,Damaged packaging
+356,2026-08-01,Late delivery
+357,2026-08-01,Billing error
+358,2026-08-01,Late delivery
+359,2026-08-02,Late delivery
+360,2026-08-02,Wrong item shipped
+361,2026-08-02,Billing error
+362,2026-08-02,Wrong item shipped
+363,2026-08-02,Wrong item shipped
+364,2026-08-02,Damaged packaging
+365,2026-08-02,Wrong item shipped
+366,2026-08-02,Damaged packaging
+367,2026-08-02,Late delivery
+368,2026-08-02,Billing error
+369,2026-08-03,Late delivery
+370,2026-08-03,Billing error
+371,2026-08-03,Rude support agent
+372,2026-08-03,Website checkout bug
+373,2026-08-03,Missing parts
+374,2026-08-03,Wrong item shipped
+375,2026-08-03,Late delivery
+376,2026-08-03,Billing error
+377,2026-08-03,Damaged packaging
+378,2026-08-04,Late delivery
+379,2026-08-04,Damaged packaging
+380,2026-08-04,Billing error
+381,2026-08-04,Late delivery
+382,2026-08-04,Late delivery
+383,2026-08-04,Wrong item shipped
+384,2026-08-04,Wrong item shipped
+385,2026-08-05,Hard-to-read instructions
+386,2026-08-05,Late delivery
+387,2026-08-05,Rude support agent
+388,2026-08-05,Damaged packaging
+389,2026-08-05,Damaged packaging
+390,2026-08-05,Late delivery
+391,2026-08-05,Wrong item shipped
+392,2026-08-05,Late delivery
+393,2026-08-06,Hard-to-read instructions
+394,2026-08-06,Billing error
+395,2026-08-06,Billing error
+396,2026-08-06,Damaged packaging
+397,2026-08-06,Damaged packaging
+398,2026-08-06,Late delivery
+399,2026-08-06,Damaged packaging
+400,2026-08-06,Damaged packaging
+401,2026-08-07,Late delivery
+402,2026-08-07,Late delivery
+403,2026-08-07,Late delivery
+404,2026-08-07,Damaged packaging
+405,2026-08-07,Damaged packaging
+406,2026-08-07,Damaged packaging
+407,2026-08-07,Missing parts
+408,2026-08-07,Billing error
+409,2026-08-07,Late delivery
+410,2026-08-07,Late delivery
+411,2026-08-07,Late delivery
+412,2026-08-07,Wrong item shipped
+413,2026-08-08,Billing error
+414,2026-08-08,Late delivery
+415,2026-08-08,Wrong item shipped
+416,2026-08-08,Wrong item shipped
+417,2026-08-08,Late delivery
+418,2026-08-08,Late delivery
+419,2026-08-08,Website checkout bug
+420,2026-08-08,Damaged packaging
+421,2026-08-08,Damaged packaging
+422,2026-08-09,Billing error
+423,2026-08-09,Wrong item shipped
+424,2026-08-09,Damaged packaging
+425,2026-08-09,Late delivery
+426,2026-08-09,Late delivery
+427,2026-08-09,Rude support agent
+428,2026-08-09,Other
+429,2026-08-09,Wrong item shipped
+430,2026-08-09,Wrong item shipped
+431,2026-08-09,Wrong item shipped
+432,2026-08-09,Website checkout bug
+433,2026-08-10,Damaged packaging
+434,2026-08-10,Damaged packaging
+435,2026-08-10,Wrong item shipped
+436,2026-08-10,Late delivery
+437,2026-08-10,Damaged packaging
+438,2026-08-10,Late delivery
+439,2026-08-10,Wrong item shipped
+440,2026-08-10,Damaged packaging
+441,2026-08-10,Billing error
+442,2026-08-10,Late delivery
+443,2026-08-10,Late delivery
+444,2026-08-10,Wrong item shipped
+445,2026-08-10,Late delivery
+446,2026-08-11,Late delivery
+447,2026-08-11,Wrong item shipped
+448,2026-08-11,Billing error
+449,2026-08-11,Other
+450,2026-08-11,Late delivery
+451,2026-08-11,Other
+452,2026-08-12,Late delivery
+453,2026-08-12,Damaged packaging
+454,2026-08-12,Wrong item shipped
+455,2026-08-12,Rude support agent
+456,2026-08-12,Late delivery
+457,2026-08-12,Late delivery
+458,2026-08-12,Damaged packaging
+459,2026-08-12,Damaged packaging
+460,2026-08-12,Late delivery
+461,2026-08-13,Billing error
+462,2026-08-13,Website checkout bug
+463,2026-08-13,Hard-to-read instructions
+464,2026-08-13,Billing error
+465,2026-08-13,Damaged packaging
+466,2026-08-13,Wrong item shipped
+467,2026-08-13,Late delivery
+468,2026-08-14,Wrong item shipped
+469,2026-08-14,Wrong item shipped
+470,2026-08-14,Late delivery
+471,2026-08-14,Wrong item shipped
+472,2026-08-14,Rude support agent
+473,2026-08-14,Wrong item shipped
+474,2026-08-14,Late delivery
+475,2026-08-14,Damaged packaging
+476,2026-08-14,Missing parts
+477,2026-08-14,Damaged packaging
+478,2026-08-15,Late delivery
+479,2026-08-15,Late delivery
+480,2026-08-15,Late delivery
+481,2026-08-15,Rude support agent
+482,2026-08-15,Late delivery
+483,2026-08-15,Rude support agent
+484,2026-08-15,Wrong item shipped
+485,2026-08-15,Late delivery
+486,2026-08-16,Wrong item shipped
+487,2026-08-16,Rude support agent
+488,2026-08-16,Website checkout bug
+489,2026-08-16,Wrong item shipped
+490,2026-08-16,Late delivery
+491,2026-08-16,Wrong item shipped
+492,2026-08-16,Late delivery
+493,2026-08-16,Wrong item shipped
+494,2026-08-16,Late delivery
+495,2026-08-16,Damaged packaging
+496,2026-08-16,Late delivery
+497,2026-08-16,Late delivery
+498,2026-08-16,Billing error
+499,2026-08-16,Wrong item shipped
+500,2026-08-17,Other
+501,2026-08-17,Damaged packaging
+502,2026-08-17,Late delivery
+503,2026-08-17,Late delivery
+504,2026-08-17,Wrong item shipped
+505,2026-08-17,Billing error
+506,2026-08-17,Damaged packaging
+507,2026-08-17,Rude support agent
+508,2026-08-17,Hard-to-read instructions
+509,2026-08-17,Wrong item shipped
+510,2026-08-17,Hard-to-read instructions
+511,2026-08-17,Billing error
+512,2026-08-18,Rude support agent
+513,2026-08-18,Late delivery
+514,2026-08-18,Damaged packaging
+515,2026-08-18,Rude support agent
+516,2026-08-18,Late delivery
+517,2026-08-18,Damaged packaging
+518,2026-08-18,Damaged packaging
+519,2026-08-18,Wrong item shipped
+520,2026-08-18,Late delivery
+521,2026-08-18,Late delivery
+522,2026-08-19,Damaged packaging
+523,2026-08-19,Damaged packaging
+524,2026-08-19,Late delivery
+525,2026-08-19,Wrong item shipped
+526,2026-08-19,Missing parts
+527,2026-08-19,Late delivery
+528,2026-08-19,Late delivery
+529,2026-08-19,Late delivery
+530,2026-08-19,Late delivery
+531,2026-08-19,Other
+532,2026-08-19,Late delivery
+533,2026-08-19,Late delivery
+534,2026-08-20,Late delivery
+535,2026-08-20,Late delivery
+536,2026-08-20,Damaged packaging
+537,2026-08-20,Wrong item shipped
+538,2026-08-20,Rude support agent
+539,2026-08-20,Wrong item shipped
+540,2026-08-20,Hard-to-read instructions
+541,2026-08-20,Damaged packaging
+542,2026-08-20,Website checkout bug
+543,2026-08-20,Late delivery
+544,2026-08-20,Wrong item shipped
+545,2026-08-20,Billing error
+546,2026-08-21,Late delivery
+547,2026-08-21,Billing error
+548,2026-08-21,Late delivery
+549,2026-08-21,Late delivery
+550,2026-08-21,Wrong item shipped
+551,2026-08-21,Billing error
+552,2026-08-22,Billing error
+553,2026-08-22,Billing error
+554,2026-08-22,Wrong item shipped
+555,2026-08-22,Late delivery
+556,2026-08-22,Late delivery
+557,2026-08-22,Damaged packaging
+558,2026-08-22,Wrong item shipped
+559,2026-08-22,Rude support agent
+560,2026-08-22,Billing error
+561,2026-08-22,Late delivery
+562,2026-08-22,Late delivery
+563,2026-08-22,Damaged packaging
+564,2026-08-22,Wrong item shipped
+565,2026-08-22,Late delivery
+566,2026-08-23,Billing error
+567,2026-08-23,Damaged packaging
+568,2026-08-23,Late delivery
+569,2026-08-23,Late delivery
+570,2026-08-23,Damaged packaging
+571,2026-08-23,Wrong item shipped
+572,2026-08-23,Damaged packaging
+573,2026-08-23,Billing error
+574,2026-08-23,Late delivery
+575,2026-08-23,Wrong item shipped
+576,2026-08-23,Rude support agent
+577,2026-08-23,Wrong item shipped
+578,2026-08-23,Late delivery
+579,2026-08-24,Billing error
+580,2026-08-24,Rude support agent
+581,2026-08-24,Late delivery
+582,2026-08-24,Wrong item shipped
+583,2026-08-25,Damaged packaging
+584,2026-08-25,Billing error
+585,2026-08-25,Wrong item shipped
+586,2026-08-25,Rude support agent
+587,2026-08-25,Late delivery
+588,2026-08-25,Missing parts
+589,2026-08-25,Damaged packaging
+590,2026-08-25,Late delivery
+591,2026-08-25,Billing error
+592,2026-08-26,Damaged packaging
+593,2026-08-26,Wrong item shipped
+594,2026-08-26,Billing error
+595,2026-08-26,Billing error
+596,2026-08-26,Wrong item shipped
+597,2026-08-26,Wrong item shipped
+598,2026-08-26,Wrong item shipped
+599,2026-08-26,Damaged packaging
+600,2026-08-26,Billing error
+601,2026-08-27,Late delivery
+602,2026-08-27,Wrong item shipped
+603,2026-08-27,Missing parts
+604,2026-08-27,Rude support agent
+605,2026-08-27,Damaged packaging
+606,2026-08-27,Late delivery
+607,2026-08-28,Billing error
+608,2026-08-28,Wrong item shipped
+609,2026-08-28,Late delivery
+610,2026-08-28,Late delivery
+611,2026-08-28,Damaged packaging
+612,2026-08-28,Late delivery
+613,2026-08-28,Late delivery
+614,2026-08-28,Late delivery
+615,2026-08-29,Late delivery
+616,2026-08-29,Late delivery
+617,2026-08-29,Late delivery
+618,2026-08-29,Late delivery
+619,2026-08-29,Rude support agent
+620,2026-08-29,Billing error
+621,2026-08-29,Billing error
+622,2026-08-29,Rude support agent
+623,2026-08-29,Late delivery
+624,2026-08-29,Late delivery
+625,2026-08-29,Late delivery
+626,2026-08-29,Rude support agent
+627,2026-08-30,Hard-to-read instructions
+628,2026-08-30,Damaged packaging
+629,2026-08-30,Wrong item shipped
+630,2026-08-30,Billing error
+631,2026-08-30,Damaged packaging
+632,2026-08-30,Wrong item shipped
+633,2026-08-31,Website checkout bug
+634,2026-08-31,Wrong item shipped
+635,2026-08-31,Wrong item shipped
+636,2026-08-31,Billing error
+637,2026-08-31,Billing error
+638,2026-08-31,Late delivery
+639,2026-08-31,Website checkout bug
+640,2026-08-31,Late delivery
+641,2026-08-31,Wrong item shipped
+642,2026-08-31,Late delivery
+643,2026-08-31,Late delivery
+644,2026-08-31,Damaged packaging
+645,2026-08-31,Late delivery
+646,2026-08-31,Late delivery
+647,2026-09-01,Damaged packaging
+648,2026-09-01,Other
+649,2026-09-01,Late delivery
+650,2026-09-01,Wrong item shipped
+651,2026-09-01,Late delivery
+652,2026-09-01,Billing error
+653,2026-09-01,Billing error
+654,2026-09-01,Billing error
+655,2026-09-01,Late delivery
+656,2026-09-02,Late delivery
+657,2026-09-02,Late delivery
+658,2026-09-02,Late delivery
+659,2026-09-03,Late delivery
+660,2026-09-03,Late delivery
+661,2026-09-03,Website checkout bug
+662,2026-09-03,Wrong item shipped
+663,2026-09-03,Wrong item shipped
+664,2026-09-03,Rude support agent
+665,2026-09-03,Wrong item shipped
+666,2026-09-03,Website checkout bug
+667,2026-09-03,Late delivery
+668,2026-09-04,Damaged packaging
+669,2026-09-04,Wrong item shipped
+670,2026-09-04,Wrong item shipped
+671,2026-09-04,Missing parts
+672,2026-09-04,Website checkout bug
+673,2026-09-04,Rude support agent
+674,2026-09-04,Billing error
+675,2026-09-04,Website checkout bug
+676,2026-09-04,Late delivery
+677,2026-09-04,Billing error
+678,2026-09-05,Wrong item shipped
+679,2026-09-05,Late delivery
+680,2026-09-05,Late delivery
+681,2026-09-05,Rude support agent
+682,2026-09-05,Wrong item shipped
+683,2026-09-05,Billing error
+684,2026-09-05,Late delivery
+685,2026-09-05,Late delivery
+686,2026-09-05,Wrong item shipped
+687,2026-09-05,Late delivery
+688,2026-09-05,Website checkout bug
+689,2026-09-05,Late delivery
+690,2026-09-05,Website checkout bug
+691,2026-09-05,Late delivery
+692,2026-09-05,Billing error
+693,2026-09-05,Late delivery
+694,2026-09-06,Late delivery
+695,2026-09-06,Website checkout bug
+696,2026-09-06,Late delivery
+697,2026-09-06,Late delivery
+698,2026-09-06,Late delivery
+699,2026-09-06,Late delivery
+700,2026-09-06,Billing error
+701,2026-09-06,Damaged packaging
+702,2026-09-06,Wrong item shipped
+703,2026-09-07,Damaged packaging
+704,2026-09-07,Wrong item shipped
+705,2026-09-07,Billing error
+706,2026-09-07,Wrong item shipped
+707,2026-09-07,Late delivery
+708,2026-09-07,Wrong item shipped
+709,2026-09-07,Damaged packaging
+710,2026-09-07,Wrong item shipped
+711,2026-09-07,Damaged packaging
+712,2026-09-07,Wrong item shipped
+713,2026-09-07,Wrong item shipped
+714,2026-09-07,Missing parts
+715,2026-09-07,Billing error
+716,2026-09-07,Hard-to-read instructions
+717,2026-09-08,Late delivery
+718,2026-09-08,Missing parts
+719,2026-09-08,Damaged packaging
+720,2026-09-08,Damaged packaging
+721,2026-09-08,Billing error
+722,2026-09-08,Late delivery
+723,2026-09-08,Late delivery
+724,2026-09-08,Late delivery
+725,2026-09-08,Damaged packaging
+726,2026-09-08,Wrong item shipped
+727,2026-09-08,Late delivery
+728,2026-09-08,Billing error
+729,2026-09-08,Late delivery
+730,2026-09-09,Late delivery
+731,2026-09-09,Wrong item shipped
+732,2026-09-09,Other
+733,2026-09-09,Late delivery
+734,2026-09-09,Missing parts
+735,2026-09-09,Wrong item shipped
+736,2026-09-09,Damaged packaging
+737,2026-09-09,Wrong item shipped
+738,2026-09-10,Billing error
+739,2026-09-10,Late delivery
+740,2026-09-10,Late delivery
+741,2026-09-10,Wrong item shipped
+742,2026-09-10,Wrong item shipped
+743,2026-09-10,Late delivery
+744,2026-09-10,Late delivery
+745,2026-09-10,Late delivery
+746,2026-09-10,Damaged packaging
+747,2026-09-10,Damaged packaging
+748,2026-09-10,Damaged packaging
+749,2026-09-10,Damaged packaging
+750,2026-09-10,Missing parts
+751,2026-09-11,Damaged packaging
+752,2026-09-11,Damaged packaging
+753,2026-09-11,Wrong item shipped
+754,2026-09-11,Wrong item shipped
+755,2026-09-11,Late delivery
+756,2026-09-11,Billing error
+757,2026-09-11,Late delivery
+758,2026-09-11,Late delivery
+759,2026-09-11,Wrong item shipped
+760,2026-09-12,Billing error
+761,2026-09-12,Wrong item shipped
+762,2026-09-12,Late delivery
+763,2026-09-12,Wrong item shipped
+764,2026-09-12,Missing parts
+765,2026-09-12,Damaged packaging
+766,2026-09-12,Rude support agent
+767,2026-09-12,Wrong item shipped
+768,2026-09-13,Billing error
+769,2026-09-13,Wrong item shipped
+770,2026-09-13,Late delivery
+771,2026-09-13,Wrong item shipped
+772,2026-09-13,Rude support agent
+773,2026-09-13,Wrong item shipped
+774,2026-09-13,Wrong item shipped
+775,2026-09-13,Wrong item shipped
+776,2026-09-13,Wrong item shipped
+777,2026-09-13,Late delivery
+778,2026-09-13,Damaged packaging
+779,2026-09-14,Late delivery
+780,2026-09-14,Website checkout bug
+781,2026-09-14,Billing error
+782,2026-09-14,Late delivery
+783,2026-09-14,Wrong item shipped
+784,2026-09-15,Damaged packaging
+785,2026-09-15,Late delivery
+786,2026-09-15,Late delivery
+787,2026-09-15,Wrong item shipped
+788,2026-09-15,Billing error
+789,2026-09-15,Billing error
+790,2026-09-15,Billing error
+791,2026-09-15,Damaged packaging
+792,2026-09-15,Wrong item shipped
+793,2026-09-16,Wrong item shipped
+794,2026-09-16,Late delivery
+795,2026-09-16,Billing error
+796,2026-09-16,Late delivery
+797,2026-09-16,Website checkout bug
+798,2026-09-16,Late delivery
+799,2026-09-16,Wrong item shipped
+800,2026-09-16,Billing error
+801,2026-09-16,Late delivery
+802,2026-09-17,Damaged packaging
+803,2026-09-17,Late delivery
+804,2026-09-17,Wrong item shipped
+805,2026-09-17,Late delivery
+806,2026-09-17,Damaged packaging
+807,2026-09-17,Late delivery
+808,2026-09-17,Billing error
+809,2026-09-17,Late delivery
+810,2026-09-17,Rude support agent
+811,2026-09-17,Missing parts
+812,2026-09-18,Wrong item shipped
+813,2026-09-18,Late delivery
+814,2026-09-18,Rude support agent
+815,2026-09-18,Late delivery
+816,2026-09-18,Billing error
+817,2026-09-18,Hard-to-read instructions
+818,2026-09-19,Late delivery
+819,2026-09-19,Wrong item shipped
+820,2026-09-19,Wrong item shipped
+821,2026-09-20,Late delivery
+822,2026-09-20,Rude support agent
+823,2026-09-20,Billing error
+824,2026-09-20,Billing error
+825,2026-09-20,Late delivery
+826,2026-09-20,Wrong item shipped
+827,2026-09-20,Wrong item shipped
+828,2026-09-20,Wrong item shipped
+829,2026-09-20,Late delivery
+830,2026-09-20,Wrong item shipped
+831,2026-09-20,Late delivery
+832,2026-09-20,Wrong item shipped
+833,2026-09-20,Wrong item shipped
+834,2026-09-21,Late delivery
+835,2026-09-21,Damaged packaging
+836,2026-09-21,Late delivery
+837,2026-09-21,Missing parts
+838,2026-09-21,Late delivery
+839,2026-09-21,Late delivery
+840,2026-09-22,Late delivery
+841,2026-09-22,Late delivery
+842,2026-09-22,Other
+843,2026-09-22,Late delivery
+844,2026-09-22,Damaged packaging
+845,2026-09-22,Damaged packaging
+846,2026-09-22,Late delivery
+847,2026-09-23,Late delivery
+848,2026-09-23,Late delivery
+849,2026-09-23,Wrong item shipped
+850,2026-09-23,Wrong item shipped
+851,2026-09-23,Late delivery
+852,2026-09-23,Late delivery
+853,2026-09-23,Damaged packaging
+854,2026-09-23,Late delivery
+855,2026-09-23,Wrong item shipped
+856,2026-09-23,Late delivery
+857,2026-09-23,Damaged packaging
+858,2026-09-24,Late delivery
+859,2026-09-24,Late delivery
+860,2026-09-24,Damaged packaging
+861,2026-09-24,Late delivery
+862,2026-09-24,Website checkout bug
+863,2026-09-24,Wrong item shipped
+864,2026-09-24,Billing error
+865,2026-09-24,Wrong item shipped
+866,2026-09-25,Wrong item shipped
+867,2026-09-25,Late delivery
+868,2026-09-25,Wrong item shipped
+869,2026-09-25,Damaged packaging
+870,2026-09-25,Wrong item shipped
+871,2026-09-25,Damaged packaging
+872,2026-09-25,Missing parts
+873,2026-09-25,Billing error
+874,2026-09-25,Billing error
+875,2026-09-25,Wrong item shipped
+876,2026-09-25,Late delivery
+877,2026-09-26,Wrong item shipped
+878,2026-09-26,Billing error
+879,2026-09-26,Wrong item shipped
+880,2026-09-27,Wrong item shipped
+881,2026-09-27,Late delivery
+882,2026-09-27,Late delivery
+883,2026-09-27,Damaged packaging
+884,2026-09-27,Late delivery
+885,2026-09-27,Late delivery
+886,2026-09-27,Late delivery
+887,2026-09-27,Late delivery
+888,2026-09-27,Hard-to-read instructions
+889,2026-09-27,Missing parts
+890,2026-09-27,Website checkout bug
+891,2026-09-27,Billing error
+892,2026-09-27,Website checkout bug
+893,2026-09-27,Damaged packaging
+894,2026-09-27,Billing error
+895,2026-09-27,Wrong item shipped
+896,2026-09-28,Wrong item shipped
+897,2026-09-28,Billing error
+898,2026-09-28,Billing error
+899,2026-09-28,Wrong item shipped
+900,2026-09-28,Wrong item shipped
+901,2026-09-28,Late delivery
+902,2026-09-28,Late delivery
+903,2026-09-29,Late delivery
+904,2026-09-29,Wrong item shipped
+905,2026-09-29,Wrong item shipped
+906,2026-09-29,Late delivery
+907,2026-09-29,Late delivery
+908,2026-09-29,Wrong item shipped
+909,2026-09-29,Wrong item shipped
+910,2026-09-29,Late delivery
+911,2026-09-29,Late delivery
+912,2026-09-29,Damaged packaging
+913,2026-09-29,Late delivery
+914,2026-09-29,Wrong item shipped
+915,2026-09-30,Rude support agent
+916,2026-09-30,Other
+917,2026-09-30,Wrong item shipped
+918,2026-09-30,Website checkout bug
+919,2026-09-30,Damaged packaging
+920,2026-09-30,Late delivery
+921,2026-09-30,Wrong item shipped
+922,2026-09-30,Wrong item shipped
+923,2026-09-30,Billing error
+924,2026-09-30,Late delivery

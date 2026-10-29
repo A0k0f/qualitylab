@@ -1,0 +1,18 @@
+{
+  "wafers": 1567,
+  "sensors": 590,
+  "fails": 104,
+  "fail_rate": 0.06636885768985322,
+  "reference_wafers": 940,
+  "reference_fails": 76,
+  "test_wafers": 627,
+  "test_fails": 28,
+  "reference_period": "2008-07-19 to 2008-09-20",
+  "test_period": "2008-09-20 to 2008-10-17",
+  "sensors_used": 444,
+  "dropped_missing": 24,
+  "dropped_constant": 122,
+  "pca_components": 120,
+  "false_alarm_budget": 0.05,
+  "passing_test_wafers_beyond_spe_limit": 0.9382303839732888
+}

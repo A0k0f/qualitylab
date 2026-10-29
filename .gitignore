@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+.venv/
+.DS_Store
+# downloaded data (SECOM is fetched at run time, not redistributed)
+case_studies/secom/data/
+*.zip
+# instructor material must never be committed
+instructor_kit/
+roster*.csv
+answer_keys*.xlsx

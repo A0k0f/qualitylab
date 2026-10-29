@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use QualityLab, please cite it as below."
+title: "QualityLab: statistical process control for teaching and practice"
+authors:
+  - family-names: Karamifard
+    given-names: Ali
+    affiliation: "University of Massachusetts Dartmouth"
+version: 0.2.0
+date-released: 2026-10-28
+license: MIT
+repository-code: "https://github.com/A0k0f/qualitylab"
+keywords:
+  - statistical process control
+  - quality management
+  - control charts
+  - process capability

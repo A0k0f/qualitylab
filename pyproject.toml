@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qualitylab"
+version = "0.2.0"
+description = "Decide how to monitor and inspect a process (Monte Carlo what-if simulator and plan optimizer), plus a full statistical process control toolkit with a no-code web app."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Ali Karamifard" }]
+requires-python = ">=3.10"
+keywords = ["statistical process control", "SPC", "control chart", "quality", "process capability", "six sigma"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Education",
+  "Intended Audience :: Manufacturing",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "License :: OSI Approved :: MIT License",
+]
+dependencies = ["numpy>=1.24", "pandas>=2.0", "scipy>=1.10", "matplotlib>=3.7"]
+
+[project.optional-dependencies]
+app = ["streamlit>=1.40", "openpyxl>=3.1"]
+case-study = ["scikit-learn>=1.3"]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.urls]
+Homepage = "https://github.com/A0k0f/qualitylab"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qualitylab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = ["slow: Monte Carlo ARL checks (deselect with -m 'not slow')"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E731", "E501", "B905"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/*" = ["E402"]
+"tests/*" = ["E402"]
+"case_studies/*" = ["E402"]
