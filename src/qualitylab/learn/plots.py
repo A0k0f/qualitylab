@@ -228,12 +228,15 @@ def process_lab_figure(exp, r):
     ax.axhline(P.target, color=INK_3, lw=0.8)
     ax.set_ylabel(P.unit, color=INK_2)
     ax.set_title("What really happened", loc="left", fontsize=11, fontweight="bold", color=INK)
-    ax.text(P.baseline / 2 + 0.5, 0.03, "baseline (setting up the chart)", transform=ax.get_xaxis_transform(),
-            ha="center", va="bottom", fontsize=8, color=INK_2)
+    from matplotlib.patches import Patch
+
+    baseline_patch = Patch(facecolor=GRID, alpha=0.9, label="baseline (setting up the chart)")
     for c in exp.changes:
         ax.text(c.at - 0.3, 1.0, c.kind, transform=ax.get_xaxis_transform(), ha="left", va="bottom", fontsize=8,
                 color=CHANGE_COLORS.get(c.kind, INK_3), fontweight="bold")
-    ax.legend(loc="upper left", bbox_to_anchor=(0, -0.02), fontsize=8, frameon=False, ncol=3)
+    handles, _ = ax.get_legend_handles_labels()
+    ax.legend(handles=handles + [baseline_patch], loc="upper left", bbox_to_anchor=(0, -0.02), fontsize=8,
+              frameon=False, ncol=4)
 
     # 2 · the chart
     ax = axs[1]

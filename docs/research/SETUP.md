@@ -25,7 +25,7 @@ Use the storage platform your IRB approved. Most universities approve their own 
    ```bash
    python3 -c "import secrets; print(secrets.token_urlsafe(32))"
    ```
-   Paste the result between the quotes on the line `const TOKEN = '...'` and save (💾).
+   Paste the result between the quotes on the line `const TOKEN = '...'` and save (💾). If you also use the participation record, give each Sheet its own token; never reuse the participation Sheet for research.
 4. Choose **Deploy → New deployment**. Click the gear next to *Select type* and pick **Web app**.
    * Execute as: **Me**
    * Who has access: **Anyone** (the token, not the URL, is what protects the data; this setting only lets the app reach the script)

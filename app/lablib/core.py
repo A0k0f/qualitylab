@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 import streamlit as st  # noqa: E402
 
-from qualitylab import research  # noqa: E402
+from qualitylab import research, teaching  # noqa: E402
 
 MISSIONS = {
     "redbeads": dict(title="The Red Bead Factory", icon="🔴", minutes=12,
@@ -56,6 +56,7 @@ def lab() -> dict:
             done={}, started={},
             m={},                  # per-mission state
             pre=None, post=None, survey=None,
+            student="",            # name typed for the participation record (teaching use only)
             shown={},
         )
     return st.session_state.lab
@@ -65,6 +66,16 @@ def cfg() -> research.ResearchConfig:
     if "lab_cfg" not in st.session_state:
         st.session_state.lab_cfg = research.load_config()
     return st.session_state.lab_cfg
+
+
+def tcfg() -> teaching.TeachingConfig:
+    if "lab_tcfg" not in st.session_state:
+        st.session_state.lab_tcfg = teaching.load_config()
+    return st.session_state.lab_tcfg
+
+
+def recording_participation() -> bool:
+    return tcfg().active and bool(lab()["student"])
 
 
 def collecting() -> bool:
@@ -117,6 +128,11 @@ def log(mission: str, step: str, event_type: str, *, timer: str | None = None, *
         sink.submit([ev])
         if event_type == "complete" and sink.pending:
             sink.flush(wait=False)  # retry anything a network hiccup held back, without making the student wait
+    if recording_participation():  # separate store, with the name and without the research code or condition
+        tsink = teaching.get_sink(tcfg())
+        tsink.submit([teaching.to_teaching_event(ev, L["student"], tcfg())])
+        if event_type == "complete" and tsink.pending:
+            tsink.flush(wait=False)
     return ev
 
 

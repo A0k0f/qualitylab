@@ -182,3 +182,21 @@ def test_analysis_script_runs(tmp_path):
     import pandas as pd
     p = pd.read_csv(tmp_path / "o3" / "participants.csv")
     assert len(p) == 11 and "P-SYN00000" not in set(p["participant_id"])
+
+
+def test_teaching_config_and_events():
+    from qualitylab import teaching as T
+    assert not T.TeachingConfig().active and not T.load_config({}).active
+    assert T.TeachingConfig(enabled=True, backend="local").active
+    bad = T.TeachingConfig(enabled=True, webhook_url="http://x", webhook_token="short", detail="all")
+    assert len(bad.problems()) == 3
+    with pytest.raises(ValueError):
+        T.clean_name(" a ")
+    assert T.clean_name("  Ada   Lovelace ") == "Ada Lovelace"
+    ev = R.make_event(session_id="s", participant_id="P-SECRET", condition="no_predict", course_code="R",
+                      mission="processlab", step="exp1", event_type="decision", response={"x": 1}, score=3)
+    full = T.to_teaching_event(ev, "Ada", T.TeachingConfig(enabled=True, backend="local", course_code="C"))
+    assert list(full) == T.FIELDS and full["student"] == "Ada" and full["course_code"] == "C"
+    assert "P-SECRET" not in json.dumps(full) and "no_predict" not in json.dumps(full) and full["response"]
+    summ = T.to_teaching_event(ev, "Ada", T.TeachingConfig(enabled=True, backend="local", detail="summary"))
+    assert summ["response"] == "" and summ["score"] == "" and summ["mission"] == "processlab"

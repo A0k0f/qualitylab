@@ -260,11 +260,12 @@ class WebhookBackend:
 
     name = "webhook"
 
-    def __init__(self, url: str, token: str, timeout: float = 10.0):
+    def __init__(self, url: str, token: str, timeout: float = 10.0, fields: list[str] | None = None):
         self.url, self.token, self.timeout = url, token, timeout
+        self.fields = list(fields or FIELDS)
 
     def append(self, events: list[dict]) -> None:
-        body = json.dumps({"token": self.token, "events": events}).encode()
+        body = json.dumps({"token": self.token, "fields": self.fields, "events": events}).encode()
         req = urllib.request.Request(self.url, data=body, headers={"Content-Type": "text/plain;charset=utf-8"},
                                      method="POST")
         with urllib.request.urlopen(req, timeout=self.timeout) as r:  # noqa: S310 - https enforced by config

@@ -3,6 +3,7 @@
 Runs headlessly with Streamlit's AppTest in research mode with a local JSON-lines store, once per
 experimental condition, then checks that the logged data feed the analysis pipeline.
 """
+import json
 from pathlib import Path
 
 import pytest
@@ -314,4 +315,75 @@ def test_instructor_page_needs_the_right_password():
     assert not at.tabs and any("Wrong password" in e.value for e in at.error)
     at.text_input[0].set_value("correct horse")
     at.button[0].click().run()
+    assert not at.exception and not at.tabs                      # participation view first (off here)
+    assert any("participation record is **off**" in i.value for i in at.info)
+    at.radio[0].set_value(at.radio[0].options[1]).run()          # research view: synthetic preview
     assert not at.exception and len(at.tabs) == 5
+
+
+def test_participation_record_is_named_and_kept_apart_from_research(tmp_path):
+    teach, res = tmp_path / "teach.jsonl", tmp_path / "research.jsonl"
+    at = AppTest.from_file(PAGE, default_timeout=120)
+    at.secrets["teaching"] = dict(enabled=True, backend="local", local_path=str(teach), course_code="POM445")
+    at.secrets["research"] = dict(enabled=True, irb_protocol="TEST-1", pi_name="PI", pi_email="pi@x.edu",
+                                  backend="local", local_path=str(res), salt=SALT)
+    at.run()
+    assert any("Your name, for participation" in h.value for h in at.subheader)
+    p = Player(at)
+    p.click("Continue")                                   # empty name is refused
+    assert at.error and not at.session_state["lab"]["student"]
+    at.text_input[0].set_value("  Ada   Lovelace ")
+    p.click("Continue")
+    assert any("research study" in h.value for h in at.subheader)  # then the (separate) research consent
+    at.checkbox(key="consent_adult").check().run()
+    p.click("✅ I agree")
+    for ti, v in zip(at.text_input, ["MA", "07", "BO"]):
+        ti.set_value(v)
+    p.click("Create my code")
+    play_process_lab(at, at.session_state["lab"]["condition"] != "no_predict")
+    from qualitylab import teaching
+    lab = at.session_state["lab"]
+    teaching.get_sink(teaching.TeachingConfig.from_mapping(dict(at.secrets["teaching"]))).flush()
+    research.get_sink(research.ResearchConfig.from_mapping(dict(at.secrets["research"]))).flush()
+    t_ev, r_ev = research.LocalBackend(str(teach)).read(), research.LocalBackend(str(res)).read()
+    assert t_ev and r_ev
+    assert {e["student"] for e in t_ev} == {"Ada Lovelace"} and {e["course_code"] for e in t_ev} == {"POM445"}
+    assert all("participant_id" not in e and "condition" not in e for e in t_ev)
+    assert not any(lab["pid"] in json.dumps(e) for e in t_ev)          # no research code in the teaching record
+    assert not any("Lovelace" in json.dumps(e) for e in r_ev)          # no name in the research data
+    T = teaching.participation(t_ev)
+    assert T.loc[0, "student"] == "Ada Lovelace" and T.loc[0, "process_lab_experiments"] == 3
+    assert T.loc[0, "process_lab_finished"]
+
+
+def test_participation_summary_mode_keeps_no_inputs(tmp_path):
+    teach = tmp_path / "teach.jsonl"
+    at = AppTest.from_file(PAGE, default_timeout=120)
+    at.secrets["teaching"] = dict(enabled=True, backend="local", local_path=str(teach), detail="summary")
+    at.run()
+    at.text_input[0].set_value("Grace Hopper")
+    Player(at).click("Continue")
+    play_process_lab(at, True)
+    from qualitylab import teaching
+    teaching.get_sink(teaching.TeachingConfig.from_mapping(dict(at.secrets["teaching"]))).flush()
+    t_ev = research.LocalBackend(str(teach)).read()
+    assert t_ev and all(e["response"] == "" and e["detail"] == "" and e["score"] == "" for e in t_ev)
+    assert teaching.participation(t_ev).loc[0, "process_lab_experiments"] == 3
+
+
+def test_instructor_participation_view(tmp_path):
+    from qualitylab import teaching
+    teach = tmp_path / "teach.jsonl"
+    cfg = teaching.TeachingConfig(enabled=True, backend="local", local_path=str(teach))
+    ev = research.make_event(session_id="s1", participant_id="", condition="", course_code="", mission="processlab",
+                             step="exp1", event_type="result")
+    research.LocalBackend(str(teach)).append([teaching.to_teaching_event(ev, "Ada Lovelace", cfg)])
+    at = AppTest.from_file(INSTRUCTOR, default_timeout=120)
+    at.secrets["instructor_password"] = "pw"
+    at.secrets["teaching"] = dict(enabled=True, backend="local", local_path=str(teach))
+    at.run()
+    at.text_input[0].set_value("pw")
+    at.button[0].click().run()
+    assert not at.exception
+    assert any(m.label == "Students" and m.value == "1" for m in at.metric)
+    assert at.dataframe[0].value.loc[0, "student"] == "Ada Lovelace"

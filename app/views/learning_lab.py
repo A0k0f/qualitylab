@@ -12,7 +12,7 @@ for p in (ROOT / "src", ROOT / "app"):
         sys.path.insert(0, str(p))
 
 from lablib import home, m_capability, m_funnel, m_manager, m_pareto, m_processlab, m_redbeads, m_signals  # noqa: E402,I001
-from lablib.core import GUIDED, MISSIONS, cfg, collecting, go, lab  # noqa: E402
+from lablib.core import GUIDED, MISSIONS, cfg, collecting, go, lab, tcfg  # noqa: E402
 
 PAGES = {"processlab": m_processlab.run, "redbeads": m_redbeads.run, "signals": m_signals.run, "funnel": m_funnel.run,
          "capability": m_capability.run, "pareto": m_pareto.run, "manager": m_manager.run}
@@ -35,6 +35,11 @@ with st.sidebar:
         go("home")
     if collecting():
         st.caption(f"Research code: {L['pid']}")
+
+# participation record (teaching use): name first, when the instructor has turned it on
+if tcfg().active and not L["student"]:
+    home.name_view()
+    st.stop()
 
 # consent gate (only when the deployment is configured for an approved study)
 if cfg().active and L["consent"] is None:

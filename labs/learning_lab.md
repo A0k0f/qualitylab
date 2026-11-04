@@ -81,6 +81,10 @@ Students can download their **learning record** (an HTML page with their own pre
 
 Grade the reflection, not the scores in the missions, so that students are free to experiment and make mistakes. Grading must not depend on whether a student takes part in the research study.
 
+## Checking participation
+
+To see who used the Learning Lab and what they did, turn on the optional participation record: students type their name first and their activity goes to a Google Sheet you own. It is kept apart from research data. See [docs/PARTICIPATION.md](../docs/PARTICIPATION.md).
+
 ## Research use
 
 If you want to study how much students learn, the Learning Lab can store anonymous responses from students who consent. It is **off by default**. See [docs/research/](../docs/research/) for the IRB-ready study design, consent text, setup steps and analysis script.

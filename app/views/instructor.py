@@ -17,7 +17,7 @@ import streamlit as st  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
-from qualitylab import research  # noqa: E402
+from qualitylab import research, teaching  # noqa: E402
 from qualitylab import research_analysis as RA  # noqa: E402
 from qualitylab.learn import concepts as C  # noqa: E402
 from qualitylab.plotting import INK, INK_2, INK_3, SERIES, SERIES_2, _style  # noqa: E402
@@ -67,6 +67,47 @@ if not st.session_state.get("instr_ok"):
 if st.button("Lock this page"):
     st.session_state.instr_ok = False
     st.rerun()
+
+VIEW = st.radio("Show", ["📋 Participation (who did what)", "🔬 Research data (anonymous)"], horizontal=True,
+                label_visibility="collapsed")
+
+if VIEW.startswith("📋"):
+    tcfg = teaching.load_config()
+    if not tcfg.active:
+        if tcfg.enabled:
+            st.error("The participation record is switched on but incomplete, so nothing is recorded:\n\n- "
+                     + "\n- ".join(tcfg.problems()))
+        else:
+            st.info("The participation record is **off**: students use the Learning Lab without giving their name, "
+                    "and nothing is stored. To turn it on, add a `[teaching]` section to the app's Secrets "
+                    "(see `docs/PARTICIPATION.md`).")
+        st.stop()
+    st.caption(f"Recording: **on** · course {tcfg.course_code or '(none)'} · detail: {tcfg.detail}"
+               + (" (every input)" if tcfg.detail == "full" else " (what was started and finished, and when)"))
+    try:
+        with st.spinner("Loading the participation record…"):
+            tev = teaching.make_backend(tcfg).read()
+    except Exception as e:  # noqa: BLE001
+        st.error(f"Could not read the participation record: {e}")
+        st.stop()
+    if not tev:
+        st.info("No activity recorded yet.")
+        st.stop()
+    T = teaching.participation(tev)
+    a, b, c, d = st.columns(4)
+    a.metric("Students", len(T))
+    b.metric("Did the warm-up check", int(T["warm_up_check"].sum()))
+    c.metric("Ran at least one experiment", int((T["process_lab_experiments"] > 0).sum()))
+    d.metric("Did the final check", int(T["final_check"].sum()))
+    st.dataframe(T.rename(columns={"first_seen": "first seen (Eastern)", "last_seen": "last seen (Eastern)"}),
+                 hide_index=True, width="stretch")
+    st.caption("Names are as students typed them; the same name typed differently shows as two rows. "
+               "Minutes active = time between a student's first and last action in each visit.")
+    x1, x2 = st.columns(2)
+    x1.download_button("Participation summary (CSV)", T.to_csv(index=False).encode(), "participation.csv", "text/csv")
+    x2.download_button("Every recorded action (CSV)", pd.DataFrame(tev).to_csv(index=False).encode(),
+                       "participation_events.csv", "text/csv")
+    st.stop()
 
 with st.expander("Research configuration status", expanded=not cfg.active):
     if cfg.active:

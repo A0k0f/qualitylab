@@ -37,6 +37,10 @@ The Process Lab's results are checked against SPC theory (`tests/test_process_la
 
 **For instructors.** A [teaching guide](labs/learning_lab.md) has open questions for students, schedules, an assignment and debrief ideas. The password-protected **Instructor** page shows anonymous, class-level results: how many experiments students ran, which settings they changed, whether they changed one thing at a time, whether their predictions improved, and the mission results.
 
+### Participation record (optional, off by default)
+
+Instructors can turn on a named record of who used the Learning Lab and what they did, to check participation. Students type their name first; activity goes to a Google Sheet the instructor owns, separate from any research data. See [docs/PARTICIPATION.md](docs/PARTICIPATION.md).
+
 ### Research kit (optional, off by default)
 
 For instructors who want to publish what students learn, the [research kit](docs/research/) provides:
@@ -190,6 +194,7 @@ app/                   Streamlit app: Home, Learning Lab, Decision Studio, SPC T
 case_studies/secom/    case study on a public semiconductor dataset
 labs/                  Learning Lab teaching guide and four classroom labs
 docs/research/         research kit: setup, study design, consent template, data dictionary, Apps Script
+docs/PARTICIPATION.md  optional named participation record for teaching
 tests/                 unit, validation and end-to-end app tests
 scripts/               analysis of Learning Lab data; regenerates the d2/d3 constants table
 ```

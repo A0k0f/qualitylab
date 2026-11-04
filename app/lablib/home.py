@@ -8,7 +8,7 @@ from datetime import datetime
 import numpy as np
 import streamlit as st
 
-from qualitylab import research
+from qualitylab import research, teaching
 from qualitylab.learn import concepts as C
 
 from .core import GUIDED, MISSIONS, ask_predictions, cfg, collecting, go, lab, log, seed_for, shown
@@ -55,6 +55,27 @@ research.
         st.caption("If you are under 18, please choose “No thanks”. You can use everything in the Learning Lab.")
 
 
+def name_view() -> None:
+    """Participation record (teaching use): the student's name, before anything else."""
+    st.title("🎓 Learning Lab")
+    st.subheader("Your name, for participation")
+    st.markdown("Your instructor records **who uses the Learning Lab and what they do in it** (for example, the "
+                "experiments you run and the checks you complete) to see participation. The record is kept by your "
+                "instructor and is not shared. Your answers in the Learning Lab are **not graded**: try things, make "
+                "mistakes, change your mind.")
+    with st.form("student_name"):
+        name = st.text_input("Your first and last name, as on the class roster", max_chars=60)
+        ok = st.form_submit_button("Continue", type="primary")
+    if ok:
+        try:
+            lab()["student"] = teaching.clean_name(name)
+        except ValueError as e:
+            st.error(str(e))
+            return
+        log("participation", "start", "start")
+        st.rerun()
+
+
 def code_view() -> None:
     st.title("🎓 Learning Lab")
     st.subheader("Create your anonymous code")
@@ -92,6 +113,8 @@ def home_view() -> None:
              "it and run the experiment: every number and chart comes from your settings. "
              + ("Before each run you **predict** what will happen, then compare. " if ask_predictions() else "")
              + "Surprises are part of the design: they are where the learning happens.")
+    if L.get("student"):
+        st.caption(f"Signed in for participation as **{L['student']}**. Not you? Close this tab and open the app again.")
     if collecting():
         st.caption(f"Research participation: on · your code **{L['pid']}** (write it down if you want to withdraw later)")
     elif cfg().active and L["consent"] is False:
