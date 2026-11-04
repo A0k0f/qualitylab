@@ -177,7 +177,7 @@ def _bottling_line(rng):
 # Each generated dataset is checked so that, with the settings the labs use,
 # the planted story is visible and there are no false alarms in the reference
 # period. Draws that fail are regenerated (deterministically for a given seed).
-# Real data are messier; these are teaching datasets.
+# These are teaching datasets; data from actual operations are messier.
 # ---------------------------------------------------------------------------
 
 def _first(res, phase2_only=False):

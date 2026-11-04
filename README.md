@@ -1,6 +1,6 @@
 # QualityLab
 
-**Decide how to watch a process before problems reach your customers. Then run the charts that do the watching.**
+**Learn quality management by making the decisions. Decide how to watch a process before problems reach your customers. Then run the charts that do the watching.**
 
 [![tests](https://github.com/A0k0f/qualitylab/actions/workflows/ci.yml/badge.svg)](https://github.com/A0k0f/qualitylab/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
@@ -8,12 +8,45 @@
 
 Every operation, from a filling line to a warehouse or an accounts-payable team, faces the same nagging questions: *How often should we check? Is our audit catching anything, or just raising false alarms? Should we inspect everything, sample lots, or neither? Is a new machine worth it?* QualityLab answers them with numbers you can take to a meeting.
 
-It has four parts:
+It has five parts:
 
+* **🎓 Learning Lab (for students).** Six short missions in which business students make quality decisions and live with the consequences: manage workers in Deming's red bead factory, tell signals from noise on sixteen business charts, run a filling machine by hand, rescue a customer contract with Cp and Cpk, spend a quality budget, and design an inspection plan. Each mission follows *predict → decide → observe → explain*, with a concept check before and after. No statistics background needed. An optional, consent-based **research kit** lets instructors study how much students learn, with an IRB-ready design and anonymous data collection.
 * **🧭 Decision Studio (for managers).** Describe a process in plain terms: volume, what goes wrong and how often, what mistakes cost, how you check today. A Monte Carlo simulator replays years of operation under hundreds of monitoring and inspection plans. It recommends the cheapest plan that meets your limits (and a simpler one that is nearly as cheap), with the expected saving and its range. It also tests whether the answer survives if your estimates are off, finds the best process aim (overfill vs. out-of-spec), and prices improvement investments. Six editable industry scenarios are included.
 * **📈 SPC Toolkit (for analysts and classes).** Upload data or open a practice scenario and get the right control chart (X̄-R, X̄-S, I-MR, p, np, c, u, Laney p′/u′, EWMA, CUSUM, Hotelling T²) with all eight run rules, capability with confidence intervals, and Pareto, each with a plain-language reading.
 * **A tested Python library** behind both (about 100 tests), validated against textbook tables and published run-length results.
-* **A case study on real fab data** ([SECOM](case_studies/secom/)). It asks whether SPC or machine learning, monitoring 590 sensors, can flag failing wafers, using a leakage-free, time-ordered design.
+* **A case study on a public semiconductor fab dataset** ([SECOM](case_studies/secom/)). It asks whether SPC or machine learning, monitoring 590 sensors, can flag failing wafers, using a leakage-free, time-ordered design.
+
+## Learning Lab
+
+![Learning Lab missions](docs/img/learning_lab_home.png)
+
+| Mission | Students... | ...and discover |
+|---|---|---|
+| 🔴 The Red Bead Factory | reward, warn or fire six workers based on their defects, then pick one change to the system | the differences came from the system; the "improvement" after a warning was regression to the mean |
+| 📡 Signal or Noise? | decide whether to investigate 16 control charts from 8 businesses, with money on each call, before and after learning the run rules | patterns matter more than single points; their own signal-detection score (d′) |
+| 🎯 The Tampering Trap | run a filling machine by hand, then compare Deming's four funnel rules | adjusting a stable process after every unit makes it worse |
+| 📏 Keep the Customer | find the cheapest way to reach the Cpk ≥ 1.33 a customer demands | control limits are not specification limits; centering beats buying a new machine; inspection does not create capability |
+| 💰 Where Does the Money Go? | classify costs of quality and spend a $40,000 budget on improvement projects | rank problems by cost, not count; the best portfolio is not what rules of thumb pick |
+| 🧭 Be the Quality Manager | design a monitoring plan for a bottling line and see its cost over a simulated year | checking is an investment with a measurable return |
+
+| The reveal in the red bead factory | Signal or noise? |
+|---|---|
+| ![](docs/img/learning_lab_redbeads.png) | ![](docs/img/learning_lab_signals.png) |
+
+Every "right answer" the missions teach is checked by tests: the red bead distribution and the regression-to-the-mean figures, the funnel rules' theoretical spread, the ground truth of every generated chart under the taught rules (across many seeds), the cheapest capability fix, the exact knapsack optimum for the project budget, and the best monitoring plan. See `tests/test_learn.py`.
+
+**For instructors.** A [teaching guide](labs/learning_lab.md) maps the missions to course objectives and suggests schedules and debrief questions. The **Instructor** page shows anonymous, class-level results for debriefing (e.g. how many students warned the worker with the most red beads, and what happened to that worker the next day).
+
+### Research kit (optional, off by default)
+
+For instructors who want to publish what students learn, the [research kit](docs/research/) provides:
+
+* **Consent-gated, anonymous collection.** Nothing is stored unless the deployment is configured with an IRB protocol number and the student agrees and confirms they are 18 or older. Students who decline get the same Learning Lab. No names, emails, student IDs or IP addresses are collected; students are linked across sessions by a salted hash of a self-generated code.
+* **A study design ready to adapt:** pre/post concept check, within-mission decision measures (d′, tampering slope, portfolio optimality, plan regret), confidence calibration, System Usability Scale, and an optional randomised comparison of *predicting first* vs. not.
+* **Your own data store:** a Google Apps Script that writes to a Google Sheet you own (or any HTTPS endpoint, e.g. Power Automate).
+* **Analysis:** `scripts/analyze_learning_lab.py` produces participant tables, item statistics, paired tests with effect sizes and CIs, ANCOVA for the condition effect, and a short report. It runs on synthetic data out of the box.
+
+![Instructor debrief view (synthetic preview)](docs/img/learning_lab_instructor.png)
 
 ## Decision Studio
 
@@ -65,11 +98,11 @@ print("\n".join(explain(d)))
 ```bash
 git clone https://github.com/A0k0f/qualitylab.git
 cd qualitylab
-pip install -e ".[app]"          # library + web app (Decision Studio + SPC Toolkit)
+pip install -e ".[app]"          # library + web app (Learning Lab, Decision Studio, SPC Toolkit)
 streamlit run app/streamlit_app.py
 ```
 
-Or use the **[hosted app](https://YOUR-APP.streamlit.app)** (no install).
+Or use the **[hosted app](https://qualitylab-a0k0f.streamlit.app)** (no install).
 
 ## Library quick start
 
@@ -142,23 +175,30 @@ Every chart returns a `ChartResult` with `.statistic`, `.center`, `.ucl`, `.lcl`
 
 ```bash
 pip install -e ".[dev]"
-pytest -m "not slow"   # ~95 fast tests
+pytest -m "not slow"   # ~160 fast tests, including full headless playthroughs of the Learning Lab
 pytest -m slow         # Monte Carlo ARL checks against published values
 ```
 
 ## Project layout
 
 ```text
-src/qualitylab/     library (charts, rules, capability, multivariate, ARL, datasets, simulate, decide, plotting)
-app/                Streamlit app: Home, Decision Studio, SPC Toolkit
-case_studies/secom/ real-data case study
-labs/               four classroom labs built on the app
-tests/              unit and validation tests
-scripts/            regenerates the d2/d3 constants table
+src/qualitylab/        library (charts, rules, capability, multivariate, ARL, datasets, simulate, decide, plotting)
+src/qualitylab/learn/  Learning Lab engines (red beads, signals, funnel, capability, Pareto, manager, concept check)
+src/qualitylab/research*.py  consent-gated logging and analysis for the research kit
+app/                   Streamlit app: Home, Learning Lab, Decision Studio, SPC Toolkit, Instructor dashboard
+case_studies/secom/    case study on a public semiconductor dataset
+labs/                  Learning Lab teaching guide and four classroom labs
+docs/research/         research kit: setup, study design, consent template, data dictionary, Apps Script
+tests/                 unit, validation and end-to-end app tests
+scripts/               analysis of Learning Lab data; regenerates the d2/d3 constants table
 ```
 
 ## References
 
+* Deming, W. E. (1986). *Out of the Crisis*. MIT Press. (Red beads, the funnel.)
+* Goetsch, D. L. & Davis, S. B. *Quality Management for Organizational Excellence: Introduction to Total Quality* (9th ed.). Pearson.
+* Hake, R. R. (1998). Interactive-engagement versus traditional methods. *American Journal of Physics* 66(1).
+* Brooke, J. (1996). SUS: a "quick and dirty" usability scale. In *Usability Evaluation in Industry*. Taylor & Francis.
 * Montgomery, D. C. *Introduction to Statistical Quality Control* (8th ed.). Wiley.
 * Nelson, L. S. (1984). The Shewhart control chart: tests for special causes. *Journal of Quality Technology* 16(4).
 * Lucas, J. M. & Saccucci, M. S. (1990). Exponentially weighted moving average control schemes. *Technometrics* 32(1).

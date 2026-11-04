@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qualitylab"
-version = "0.2.0"
-description = "Decide how to monitor and inspect a process (Monte Carlo what-if simulator and plan optimizer), plus a full statistical process control toolkit with a no-code web app."
+version = "0.3.0"
+description = "Learn, decide and run statistical process control: interactive learning missions for business students (with an optional research kit), a Monte Carlo what-if simulator for monitoring plans, and a full SPC toolkit with a no-code web app."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Ali Karamifard" }]
 requires-python = ">=3.10"
-keywords = ["statistical process control", "SPC", "control chart", "quality", "process capability", "six sigma"]
+keywords = ["statistical process control", "SPC", "control chart", "quality", "process capability", "six sigma", "quality management education", "simulation"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Intended Audience :: Education",

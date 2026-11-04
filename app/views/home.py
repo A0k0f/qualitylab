@@ -11,6 +11,15 @@ st.markdown(
     "QualityLab answers them with numbers you can take to a meeting."
 )
 
+with st.container(border=True):
+    st.markdown("### 🎓 Learning Lab")
+    st.markdown(
+        "**For students.** Six short, game-like missions that put you in a manager's seat: run Deming's Red Bead "
+        "factory, call signal or noise on business charts, try to out-adjust a filling machine, save a contract "
+        "that needs Cpk ≥ 1.33, spend an improvement budget, and design an inspection plan. Each one asks you to "
+        "**predict, decide, see the result and explain it**, with a warm-up and final check to show what you learned.")
+    st.page_link("views/learning_lab.py", label="Open the Learning Lab", icon="➡️")
+
 a, b = st.columns(2)
 with a, st.container(border=True):
     st.markdown("### 🧭 Decision Studio")

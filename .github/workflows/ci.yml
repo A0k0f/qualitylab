@@ -11,8 +11,8 @@ jobs:
       matrix:
         python-version: ["3.10", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev,app]"
@@ -22,7 +22,8 @@ jobs:
         run: |
           python - <<'PY'
           from streamlit.testing.v1 import AppTest
-          for page in ("app/streamlit_app.py", "app/views/spc_toolkit.py", "app/views/decision_studio.py"):
+          for page in ("app/streamlit_app.py", "app/views/spc_toolkit.py", "app/views/decision_studio.py",
+                       "app/views/learning_lab.py", "app/views/instructor.py"):
               at = AppTest.from_file(page, default_timeout=120)
               at.run()
               assert not at.exception, (page, at.exception)
@@ -35,9 +36,11 @@ jobs:
   validation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
       - run: pytest -m slow
+      - name: Research analysis on synthetic data
+        run: python scripts/analyze_learning_lab.py --synthetic 40 --out /tmp/ll

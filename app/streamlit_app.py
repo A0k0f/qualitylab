@@ -18,7 +18,10 @@ VIEWS = Path(__file__).resolve().parent / "views"
 home = st.Page(str(VIEWS / "home.py"), title="Home", icon="🏠", default=True)
 studio = st.Page(str(VIEWS / "decision_studio.py"), title="Decision Studio", icon="🧭", url_path="decision-studio")
 toolkit = st.Page(str(VIEWS / "spc_toolkit.py"), title="SPC Toolkit", icon="📈", url_path="toolkit")
+learn = st.Page(str(VIEWS / "learning_lab.py"), title="Learning Lab", icon="🎓", url_path="learn")
+instructor = st.Page(str(VIEWS / "instructor.py"), title="Instructor dashboard", icon="🔒", url_path="instructor")
 
 st.sidebar.markdown("### 📈 QualityLab")
-nav = st.navigation({"": [home], "For managers": [studio], "For analysts & classes": [toolkit]})
+nav = st.navigation({"": [home], "For students": [learn], "For managers": [studio],
+                     "For analysts & classes": [toolkit, instructor]})
 nav.run()

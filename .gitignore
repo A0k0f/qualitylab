@@ -14,3 +14,8 @@ case_studies/secom/data/
 instructor_kit/
 roster*.csv
 answer_keys*.xlsx
+
+# never commit secrets or locally collected research data
+.streamlit/secrets.toml
+research_data/
+*.jsonl
