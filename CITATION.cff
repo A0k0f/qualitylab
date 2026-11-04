@@ -5,7 +5,7 @@ authors:
   - family-names: Karamifard
     given-names: Ali
     affiliation: "University of Massachusetts Dartmouth"
-version: 0.4.2
+version: 0.4.3
 date-released: 2026-11-04
 license: MIT
 repository-code: "https://github.com/A0k0f/qualitylab"

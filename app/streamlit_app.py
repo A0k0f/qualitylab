@@ -10,7 +10,23 @@ from pathlib import Path
 import streamlit as st
 
 # make the package importable without installation (e.g. on Streamlit Community Cloud)
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+
+def _fresh_code() -> None:
+    """After a push, Streamlit Cloud re-runs the pages but keeps already-imported modules in memory, so
+    pages could call functions that the old modules don't have. If any of our source files changed since
+    they were imported, drop those modules so they load again from the new files."""
+    files = list((ROOT / "src" / "qualitylab").rglob("*.py")) + list((ROOT / "app" / "lablib").glob("*.py"))
+    stamp = max((f.stat().st_mtime_ns for f in files), default=0), len(files)
+    if getattr(sys, "_qualitylab_stamp", None) not in (None, stamp):
+        for name in [m for m in sys.modules if m == "qualitylab" or m.startswith(("qualitylab.", "lablib"))]:
+            del sys.modules[name]
+    sys._qualitylab_stamp = stamp
+
+
+_fresh_code()
 
 st.set_page_config(page_title="QualityLab", page_icon="📈", layout="wide")
 

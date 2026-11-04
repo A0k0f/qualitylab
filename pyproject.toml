@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qualitylab"
-version = "0.4.2"
+version = "0.4.3"
 description = "Learn, decide and run statistical process control: interactive learning missions for business students (with an optional research kit), a Monte Carlo what-if simulator for monitoring plans, and a full SPC toolkit with a no-code web app."
 readme = "README.md"
 license = "MIT"

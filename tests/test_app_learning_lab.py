@@ -394,3 +394,27 @@ def test_instructor_participation_view(tmp_path):
     assert not at.exception
     assert any(m.label == "Students" and m.value == "1" for m in at.metric)
     assert at.dataframe[0].value.loc[0, "student"] == "Ada Lovelace"
+
+
+def test_changed_source_files_are_reloaded_after_a_push():
+    import os
+    import sys
+
+    root = Path(__file__).resolve().parents[1]
+    at = AppTest.from_file(str(root / "app" / "streamlit_app.py"), default_timeout=120)
+    at.run()
+    assert not at.exception
+    import qualitylab.teaching as before
+    before._stale_marker = True
+    f = root / "src" / "qualitylab" / "teaching.py"
+    st_ = f.stat()
+    saved = {k: v for k, v in sys.modules.items() if k == "qualitylab" or k.startswith(("qualitylab.", "lablib"))}
+    try:
+        os.utime(f, ns=(st_.st_atime_ns, st_.st_mtime_ns + 3600 * 10**9))   # as if a push changed the file
+        at.run()
+        assert not at.exception
+        assert not hasattr(sys.modules.get("qualitylab.teaching") or __import__("qualitylab.teaching"), "_stale_marker")
+    finally:
+        os.utime(f, ns=(st_.st_atime_ns, st_.st_mtime_ns))
+        sys.modules.update(saved)   # other tests keep using the modules they imported
+        del before._stale_marker
