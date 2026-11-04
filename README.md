@@ -39,7 +39,7 @@ The Process Lab's results are checked against SPC theory (`tests/test_process_la
 
 ### Participation record (optional, off by default)
 
-Instructors can turn on a named record of who used the Learning Lab and what they did, to check participation. Students type their name first; activity goes to a Google Sheet the instructor owns, separate from any research data. See [docs/PARTICIPATION.md](docs/PARTICIPATION.md).
+Instructors can turn on a record of who used the Learning Lab and what they did, to check participation. Students type a participation code the instructor gives them; activity goes to a Google Sheet the instructor owns, separate from any research data. Names never leave the instructor's own roster file. See [docs/PARTICIPATION.md](docs/PARTICIPATION.md).
 
 ### Research kit (optional, off by default)
 

@@ -1,13 +1,18 @@
 """Optional participation record for the Learning Lab (teaching use, not research).
 
 When the deployment has a complete ``[teaching]`` section in its secrets, students
-type their name before using the Learning Lab and their activity is sent to a store
-the instructor controls (for example a Google Sheet in the university account), so the
-instructor can see who took part and what they did.
+identify themselves before using the Learning Lab and their activity is sent to a store
+the instructor controls (a Google Sheet), so the instructor can see who took part and
+what they did.
+
+``identify = "code"`` (default): each student types a participation code the instructor
+gave them (e.g. ``QL-7F3K2``). The store never sees a name; the list that matches codes to
+names stays with the instructor. Use this whenever the store is not a university account.
+``identify = "name"``: students type their name (only for a university-approved store).
 
 This is kept strictly apart from the research data:
 
-* teaching records carry the student's **name** and never the anonymous research code
+* teaching records carry the student's **code or name** and never the anonymous research code
   or the experimental condition;
 * research records carry the anonymous code and never the name;
 * the two go to different stores with different tokens.
@@ -19,6 +24,8 @@ so that the participation record cannot be used to identify research participant
 """
 from __future__ import annotations
 
+import random
+import re
 from dataclasses import dataclass, fields
 
 import pandas as pd
@@ -40,6 +47,7 @@ class TeachingConfig:
     webhook_token: str = ""
     local_path: str = "teaching_data/participation.jsonl"
     detail: str = "full"
+    identify: str = "code"
 
     @classmethod
     def from_mapping(cls, m) -> TeachingConfig:
@@ -63,6 +71,8 @@ class TeachingConfig:
             p.append("backend must be 'webhook' or 'local'")
         if self.detail not in ("full", "summary"):
             p.append("detail must be 'full' or 'summary'")
+        if self.identify not in ("code", "name"):
+            p.append("identify must be 'code' or 'name'")
         return p
 
     @property
@@ -106,6 +116,46 @@ def clean_name(name: str) -> str:
     return name
 
 
+CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # no 0/O or 1/I
+
+
+def clean_code(code: str) -> str:
+    c = re.sub(r"[\s_]+", "", str(code or "")).upper()
+    if not re.fullmatch(r"[A-Z0-9-]{3,20}", c):
+        raise ValueError("Please enter the participation code your instructor gave you (for example QL-7F3K2).")
+    return c
+
+
+def make_codes(names, prefix: str = "QL", seed: int | None = None) -> pd.DataFrame:
+    """A roster with one random, unique participation code per name (kept by the instructor)."""
+    rng = random.Random(seed) if seed is not None else random.SystemRandom()
+    names = [" ".join(str(n).split()) for n in names if str(n).strip()]
+    seen: set[str] = set()
+    codes = []
+    for _ in names:
+        while True:
+            c = f"{prefix}-" + "".join(rng.choice(CODE_ALPHABET) for _ in range(5))
+            if c not in seen:
+                seen.add(c)
+                codes.append(c)
+                break
+    return pd.DataFrame({"code": codes, "name": names})
+
+
+def read_roster(df: pd.DataFrame) -> dict[str, str]:
+    """code -> name from a table with columns named like 'code' and 'name' (any case)."""
+    cols = {str(c).strip().lower(): c for c in df.columns}
+    if "code" not in cols or "name" not in cols:
+        raise ValueError("The roster needs two columns named 'code' and 'name'.")
+    out = {}
+    for code, name in zip(df[cols["code"]], df[cols["name"]]):
+        try:
+            out[clean_code(code)] = " ".join(str(name).split())
+        except ValueError:
+            continue
+    return out
+
+
 def to_teaching_event(ev: dict, student: str, cfg: TeachingConfig) -> dict:
     """A Learning Lab event, re-labelled with the student's name. Drops the research code and condition."""
     out = {k: ev.get(k, "") for k in FIELDS if k != "student"}
@@ -120,8 +170,9 @@ def to_teaching_event(ev: dict, student: str, cfg: TeachingConfig) -> dict:
 # instructor view
 # ---------------------------------------------------------------------------
 
-def participation(events) -> pd.DataFrame:
-    """One row per student: when they worked, and what they started and finished."""
+def participation(events, roster: dict[str, str] | None = None) -> pd.DataFrame:
+    """One row per student: when they worked, and what they started and finished.
+    ``roster`` (code -> name) adds a name column; it is used in memory only."""
     df = pd.DataFrame(list(events))
     if df.empty:
         return pd.DataFrame()
@@ -145,6 +196,8 @@ def participation(events) -> pd.DataFrame:
             notes=int(((g["event_type"] == "text") & (g["mission"] == "processlab")).sum()),
         ))
     out = pd.DataFrame(rows).sort_values("student", key=lambda s: s.str.lower()).reset_index(drop=True)
+    if roster:
+        out.insert(1, "name", out["student"].map(lambda c: roster.get(str(c).upper(), "")))
     for c in ("first_seen", "last_seen"):
         out[c] = out[c].dt.tz_convert("America/New_York").dt.strftime("%Y-%m-%d %H:%M")
     return out

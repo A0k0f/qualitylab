@@ -6,7 +6,7 @@ from .multivariate import hotelling_t2
 from .pareto import pareto
 from .result import ChartResult
 
-__version__ = "0.4.1"
+__version__ = "0.4.2"
 
 __all__ = [
     "ChartResult", "CapabilityResult", "arl", "c_chart", "capability", "constants", "cusum",

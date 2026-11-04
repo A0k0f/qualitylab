@@ -73,12 +73,37 @@ VIEW = st.radio("Show", ["📋 Participation (who did what)", "🔬 Research dat
 
 if VIEW.startswith("📋"):
     tcfg = teaching.load_config()
+    with st.expander("🗂 Participation codes and roster", expanded=not st.session_state.get("roster")):
+        st.markdown("Students type a **participation code** instead of their name, so no names are stored in the "
+                    "participation record. Keep the list that matches codes to names yourself (for example in your "
+                    "UMassD OneDrive), and upload it here to see names on this page.")
+        r1, r2 = st.columns(2)
+        with r1:
+            st.markdown("**1 · Make codes for your class**")
+            names_txt = st.text_area("Paste student names, one per line", height=140, key="roster_names")
+            if names_txt.strip():
+                made = teaching.make_codes(names_txt.splitlines())
+                st.download_button(f"Download roster with {len(made)} codes (CSV)", made.to_csv(index=False).encode(),
+                                   "learning_lab_roster.csv", "text/csv")
+                st.caption("Each download makes new codes, so download once, save the file, and give each student "
+                           "their code (e.g. through your course site).")
+        with r2:
+            st.markdown("**2 · Show names on this page**")
+            up = st.file_uploader("Your roster (CSV or Excel with columns code and name)", type=["csv", "xlsx"])
+            if up is not None:
+                try:
+                    df_r = pd.read_csv(up) if up.name.lower().endswith(".csv") else pd.read_excel(up)
+                    st.session_state.roster = teaching.read_roster(df_r)
+                    st.success(f"{len(st.session_state.roster)} codes loaded.")
+                except Exception as e:  # noqa: BLE001
+                    st.error(f"Could not read the roster: {e}")
+            st.caption("The roster is read in memory for this visit only. It is not saved or sent anywhere.")
     if not tcfg.active:
         if tcfg.enabled:
             st.error("The participation record is switched on but incomplete, so nothing is recorded:\n\n- "
                      + "\n- ".join(tcfg.problems()))
         else:
-            st.info("The participation record is **off**: students use the Learning Lab without giving their name, "
+            st.info("The participation record is **off**: students use the Learning Lab without identifying themselves, "
                     "and nothing is stored. To turn it on, add a `[teaching]` section to the app's Secrets "
                     "(see `docs/PARTICIPATION.md`).")
         st.stop()
@@ -93,7 +118,7 @@ if VIEW.startswith("📋"):
     if not tev:
         st.info("No activity recorded yet.")
         st.stop()
-    T = teaching.participation(tev)
+    T = teaching.participation(tev, st.session_state.get("roster"))
     a, b, c, d = st.columns(4)
     a.metric("Students", len(T))
     b.metric("Did the warm-up check", int(T["warm_up_check"].sum()))
@@ -101,7 +126,7 @@ if VIEW.startswith("📋"):
     d.metric("Did the final check", int(T["final_check"].sum()))
     st.dataframe(T.rename(columns={"first_seen": "first seen (Eastern)", "last_seen": "last seen (Eastern)"}),
                  hide_index=True, width="stretch")
-    st.caption("Names are as students typed them; the same name typed differently shows as two rows. "
+    st.caption("'student' is the code (or name) as typed; codes are matched without regard to case. "
                "Minutes active = time between a student's first and last action in each visit.")
     x1, x2 = st.columns(2)
     x1.download_button("Participation summary (CSV)", T.to_csv(index=False).encode(), "participation.csv", "text/csv")

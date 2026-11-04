@@ -324,11 +324,12 @@ def test_instructor_page_needs_the_right_password():
 def test_participation_record_is_named_and_kept_apart_from_research(tmp_path):
     teach, res = tmp_path / "teach.jsonl", tmp_path / "research.jsonl"
     at = AppTest.from_file(PAGE, default_timeout=120)
-    at.secrets["teaching"] = dict(enabled=True, backend="local", local_path=str(teach), course_code="POM445")
+    at.secrets["teaching"] = dict(enabled=True, backend="local", local_path=str(teach), course_code="POM445",
+                                  identify="name")
     at.secrets["research"] = dict(enabled=True, irb_protocol="TEST-1", pi_name="PI", pi_email="pi@x.edu",
                                   backend="local", local_path=str(res), salt=SALT)
     at.run()
-    assert any("Your name, for participation" in h.value for h in at.subheader)
+    assert any("Participation sign-in" in h.value for h in at.subheader)
     p = Player(at)
     p.click("Continue")                                   # empty name is refused
     assert at.error and not at.session_state["lab"]["student"]
@@ -361,14 +362,20 @@ def test_participation_summary_mode_keeps_no_inputs(tmp_path):
     at = AppTest.from_file(PAGE, default_timeout=120)
     at.secrets["teaching"] = dict(enabled=True, backend="local", local_path=str(teach), detail="summary")
     at.run()
-    at.text_input[0].set_value("Grace Hopper")
+    assert any("Participation code" in h.value for h in at.subheader)
+    at.text_input[0].set_value("no!")
+    Player(at).click("Continue")
+    assert at.error and not at.session_state["lab"]["student"]
+    at.text_input[0].set_value(" ql-7f3k2 ")
     Player(at).click("Continue")
     play_process_lab(at, True)
     from qualitylab import teaching
     teaching.get_sink(teaching.TeachingConfig.from_mapping(dict(at.secrets["teaching"]))).flush()
     t_ev = research.LocalBackend(str(teach)).read()
     assert t_ev and all(e["response"] == "" and e["detail"] == "" and e["score"] == "" for e in t_ev)
-    assert teaching.participation(t_ev).loc[0, "process_lab_experiments"] == 3
+    assert {e["student"] for e in t_ev} == {"QL-7F3K2"}
+    T = teaching.participation(t_ev, {"QL-7F3K2": "Grace Hopper"})
+    assert T.loc[0, "process_lab_experiments"] == 3 and T.loc[0, "name"] == "Grace Hopper"
 
 
 def test_instructor_participation_view(tmp_path):

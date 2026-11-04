@@ -1,63 +1,85 @@
 # Participation record (teaching use)
 
-An optional record of **who used the Learning Lab and what they did**, so the instructor can check participation. It is off by default. When it is on, students type their name before starting and the app sends their activity to a Google Sheet that you own.
+An optional record of **who used the Learning Lab and what they did**, so the instructor can check participation. It is off by default. When it is on, students type a **participation code** that you give them (for example `QL-7F3K2`) before starting, and the app sends their activity to a Google Sheet that you own. You can download the Sheet at any time as an Excel file or a CSV.
 
-This is a teaching record, like an LMS activity log. It is **not research data**:
+**No names leave your hands.** The Sheet only ever sees codes. The list that matches codes to names stays with you, for example as an Excel file in your UMassD OneDrive. On the Instructor page you can load that list to see names; it is read in memory for that visit and not saved anywhere. Because of this, a free personal Google account works fine as the store; no university license or IT request is needed.
+
+This is a teaching record, like an LMS activity log, and it is **not research data**:
 
 * It is stored separately from the anonymous research data (different Sheet, different token).
-* It holds the student's name and never their anonymous research code or experimental condition. The research data never holds the name.
+* It never contains the anonymous research code or the experimental condition, and the research data never contain the participation code.
 * Do not use it in a paper. Research data come only from students who consent, through the research kit, after IRB approval.
 
-## Setup (about 10 minutes)
+## Setup (about 15 minutes, once per term)
 
-1. **Create the Sheet.** Sign in to your **university** Google account and create a new, empty Google Sheet, e.g. `Learning Lab participation`. Share it with nobody.
-2. **Add the script.** In the Sheet choose **Extensions → Apps Script**, delete the sample code, and paste the whole of [`research/google_apps_script.gs`](research/google_apps_script.gs). The same script serves both records; this copy belongs to the participation Sheet only.
-3. **Set a token.** In Terminal run `python3 -c "import secrets; print(secrets.token_urlsafe(32))"` and paste the result into the line `const TOKEN = '...'`. Save.
-4. **Deploy.** **Deploy → New deployment →** gear icon **→ Web app**. Execute as: **Me**. Who has access: **Anyone**. Click **Deploy**, approve the permissions, and copy the **Web app URL** (it ends in `/exec`).
-5. **Add the settings to the app.** On share.streamlit.io open your app's **⋮ → Settings → Secrets** and add, below your `instructor_password` line:
+**1. Make the codes.** Open the app's **Instructor dashboard**, enter your password, and stay on **📋 Participation**. Open **Participation codes and roster**, paste your students' names (one per line, e.g. copied from the class roster) and click **Download roster**. Save the file (e.g. `learning_lab_roster.csv`) in your UMassD OneDrive. Each download creates new codes, so download once and keep that file.
 
-   ```toml
-   [teaching]
-   enabled = true
-   course_code = "POM445-F26"
-   webhook_url = "the Web app URL from step 4"
-   webhook_token = "the token from step 3"
-   detail = "full"
-   ```
+**2. Create the Sheet.** Sign in to a Google account (a free personal one is fine, or a new one just for this course) and create a blank spreadsheet at sheets.google.com, e.g. `Learning Lab participation`. Share it with nobody.
 
-   Save. The app restarts within a minute.
-6. **Test.** Open the Learning Lab in a private window, type a test name, run one experiment, then open the **Instructor dashboard** (📋 Participation). Your test name should appear. Delete the test rows from the Sheet (keep row 1).
+**3. Add the script.** In the Sheet choose **Extensions → Apps Script**, delete the sample code, and paste the whole of [`research/google_apps_script.gs`](research/google_apps_script.gs) (open it in TextEdit from your project folder and copy everything).
+
+**4. Set a token.** In Terminal run:
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Paste the result into the line `const TOKEN = '...'` (between the quotes) and click save 💾. Keep the token for step 6.
+
+**5. Deploy.** **Deploy → New deployment →** gear icon **→ Web app**. Execute as: **Me**. Who has access: **Anyone** (the token protects the data; this setting only lets the app reach the script). Click **Deploy → Authorize access**, pick the account, and if Google says the app isn't verified click **Advanced → Go to (project name) (unsafe) → Allow**: it is your own script. Copy the **Web app URL** (it ends in `/exec`).
+
+**6. Add the settings to the app.** On share.streamlit.io open your app's **⋮ → Settings → Secrets** and make it look like this (your password line stays at the top):
+
+```toml
+instructor_password = "your password"
+
+[teaching]
+enabled = true
+course_code = "POM445-F26"
+webhook_url = "the Web app URL from step 5"
+webhook_token = "the token from step 4"
+identify = "code"
+detail = "full"
+```
+
+Save. The app restarts within a minute.
+
+**7. Test.** Open the app in a private window, go to **Learning Lab**, type one of the codes from your roster, open the Process Lab and run one experiment. In the Google Sheet a tab called **events** appears with rows. On the Instructor dashboard (📋 Participation), upload your roster: the code shows with its name and 1 experiment. Then delete the test rows in the Sheet (keep row 1, the headings).
+
+**8. Give students their codes**, for example through your course site or by email, and tell them (in class or in the syllabus) that the Learning Lab records participation by code.
 
 ## What students see
 
-Before anything else, a short screen: *"Your instructor records who uses the Learning Lab and what they do in it … to see participation. The record is kept by your instructor and is not shared. Your answers in the Learning Lab are not graded."* They type their first and last name and continue. The Learning Lab home shows the name they are signed in under.
-
-Tell students in class, or in the syllabus, that the Learning Lab records participation.
+Before anything else: *"Your instructor records who uses the Learning Lab and what they do in it … You are identified only by the code your instructor gave you; your name is not stored here. Your answers in the Learning Lab are not graded."* They type their code and continue. The Learning Lab home shows the code they are recorded under. Codes are not case-sensitive.
 
 ## What you see
 
-**Instructor dashboard → 📋 Participation** (password protected) shows one row per student:
+**Instructor dashboard → 📋 Participation** (password protected), one row per code, with the name if you uploaded your roster:
 
 | Column | Meaning |
 |---|---|
-| student | Name as typed (the same name typed differently shows as two rows) |
+| student, name | Code as typed; name from your roster |
 | sessions, first seen, last seen, minutes active | When they worked (Eastern time); minutes between first and last action in each visit |
 | warm-up check, final check, feedback | Whether they completed them |
 | process lab experiments, process lab finished | How many experiments they ran; whether they pressed *Finish* |
 | missions finished | How many of the six optional missions they completed |
 | notes | How many experiment notes they wrote |
 
-Two downloads: the summary table, and every recorded action. The Google Sheet holds the same raw record.
+Two downloads: the summary table and every recorded action. In the Google Sheet, **File → Download → Microsoft Excel (.xlsx)** gives you the raw record as an Excel file.
 
 ## How much is recorded
 
-* `detail = "full"`: every action with its content: experiment settings, predictions, results, check answers and notes. Useful for reviewing how a student worked.
-* `detail = "summary"`: only what was started and finished, and when. Enough for participation, and nothing more.
+* `detail = "full"`: every action with its content: experiment settings, predictions, results, check answers and notes.
+* `detail = "summary"`: only what was started and finished, and when.
 
-**When a research study starts, switch to `detail = "summary"`** (or turn the record off) and mention the participation record in your IRB application. A full named record next to the anonymous research data could otherwise be matched by timing, which would undo the research anonymity.
+**When a research study starts, switch to `detail = "summary"`** (or turn the record off) and mention the participation record in your IRB application, so that it cannot be used to identify research participants.
+
+## Using names instead of codes
+
+If your university provides an approved store (for example a university Google account), you can set `identify = "name"` and students type their name instead. Do not use names with a personal account.
 
 ## Good practice
 
-* Keep the Sheet in your university account and share it with nobody. It contains student names, so treat it like gradebook data.
-* Delete the Sheet's rows at the end of the term, or when your department's record-keeping rules say so.
-* Turn the record off by setting `enabled = false`.
+* Keep the roster file (codes and names) in your university storage, never in the Google account.
+* Delete the Sheet's rows at the end of the term.
+* Turn the record off with `enabled = false`.

@@ -83,7 +83,7 @@ Grade the reflection, not the scores in the missions, so that students are free 
 
 ## Checking participation
 
-To see who used the Learning Lab and what they did, turn on the optional participation record: students type their name first and their activity goes to a Google Sheet you own. It is kept apart from research data. See [docs/PARTICIPATION.md](../docs/PARTICIPATION.md).
+To see who used the Learning Lab and what they did, turn on the optional participation record: students type a participation code you give them and their activity goes to a Google Sheet you own. It is kept apart from research data. See [docs/PARTICIPATION.md](../docs/PARTICIPATION.md).
 
 ## Research use
 

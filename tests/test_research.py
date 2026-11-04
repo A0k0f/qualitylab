@@ -200,3 +200,21 @@ def test_teaching_config_and_events():
     assert "P-SECRET" not in json.dumps(full) and "no_predict" not in json.dumps(full) and full["response"]
     summ = T.to_teaching_event(ev, "Ada", T.TeachingConfig(enabled=True, backend="local", detail="summary"))
     assert summ["response"] == "" and summ["score"] == "" and summ["mission"] == "processlab"
+
+
+def test_participation_codes_and_roster():
+    import pandas as pd
+
+    from qualitylab import teaching as T
+    assert T.clean_code(" ql-7f3k2 ") == "QL-7F3K2"
+    for bad in ("", "a!", "x" * 30):
+        with pytest.raises(ValueError):
+            T.clean_code(bad)
+    r = T.make_codes(["Ada  Lovelace", "", "Grace Hopper", "Alan Turing"], seed=1)
+    assert list(r["name"]) == ["Ada Lovelace", "Grace Hopper", "Alan Turing"]
+    assert r["code"].is_unique and r["code"].str.fullmatch(r"QL-[A-HJ-NP-Z2-9]{5}").all()
+    roster = T.read_roster(pd.DataFrame({"Code": [c.lower() for c in r["code"]], "Name": r["name"]}))
+    assert roster[r["code"][0]] == "Ada Lovelace"
+    with pytest.raises(ValueError):
+        T.read_roster(pd.DataFrame({"x": [1]}))
+    assert T.TeachingConfig(enabled=True, backend="local", identify="email").problems()
