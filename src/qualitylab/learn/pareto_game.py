@@ -14,6 +14,7 @@ first).
 """
 from __future__ import annotations
 
+from functools import lru_cache
 from itertools import combinations
 
 import pandas as pd
@@ -63,6 +64,11 @@ PROJECTS = {
 
 
 def project_table() -> pd.DataFrame:
+    return _project_table().copy()
+
+
+@lru_cache(maxsize=1)
+def _project_table() -> pd.DataFrame:
     rows = []
     for k, p in PROJECTS.items():
         saving = COMPLAINTS.loc[p["category"], "annual_cost"] * p["cut"]
@@ -72,7 +78,7 @@ def project_table() -> pd.DataFrame:
 
 
 def evaluate(chosen: list[str] | set[str]) -> dict:
-    t = project_table()
+    t = _project_table()
     chosen = [c for c in chosen if c in t.index]
     cost = float(t.loc[chosen, "cost"].sum()) if chosen else 0.0
     saving = float(t.loc[chosen, "annual_saving"].sum()) if chosen else 0.0
@@ -80,6 +86,12 @@ def evaluate(chosen: list[str] | set[str]) -> dict:
 
 
 def optimal() -> dict:
+    best = _optimal()
+    return dict(best, chosen=list(best["chosen"]))
+
+
+@lru_cache(maxsize=1)
+def _optimal() -> dict:
     keys = list(PROJECTS)
     best = evaluate([])
     for r in range(1, len(keys) + 1):

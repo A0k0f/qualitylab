@@ -18,7 +18,7 @@ Yes. Taking part or not has no effect on your grade. You get exactly the same Le
 Yes. We do not record your name, email, student ID or IP address. You will create a code from three answers only you know. We store a scrambled version of it, which lets us link your answers across sessions but not identify you.
 
 **What is stored?**
-Your answers to the concept check and the survey, your predictions and decisions in the missions, how long steps took, and any short written reflections.
+Your answers to the concept check and the survey; the experiments you design in the Process Lab (your settings, predictions and results) and your decisions in the missions; how long steps took; and any short written notes.
 
 **What are my choices?**
 You can skip any question and stop at any time. *[data_access_note, by default:]* The instructor may show anonymous, class-level summaries in class (for example, "60 % of the class chose the supplier fix"). Nobody will look at individual responses until final grades for the course have been submitted, and nobody can tell from the data who took part.

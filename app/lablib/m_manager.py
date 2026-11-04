@@ -29,16 +29,21 @@ STEPS = ["The line", "Design your plan", "The verdict"]
 MAX_TRIES = 3
 
 
-@st.cache_data(show_spinner="Simulating every plan for a year of production…")
-def menu() -> pd.DataFrame:
+@st.cache_resource(show_spinner="Simulating every plan for a year of production…")
+def _simulated() -> tuple[pd.DataFrame, dict]:
+    """Run once per server and shared by every student (read-only)."""
     df = MG.simulate_menu()
+    today = df.attrs["today"]
     df.attrs = {}
-    return df
+    return df, today
 
 
-@st.cache_data(show_spinner=False)
+def menu() -> pd.DataFrame:
+    return _simulated()[0]
+
+
 def today() -> dict:
-    return MG.simulate_menu().attrs["today"]
+    return _simulated()[1]
 
 
 def _money(x: float) -> str:

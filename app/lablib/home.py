@@ -11,7 +11,7 @@ import streamlit as st
 from qualitylab import research
 from qualitylab.learn import concepts as C
 
-from .core import MISSIONS, ORDER, ask_predictions, cfg, collecting, go, lab, log, seed_for, shown
+from .core import GUIDED, MISSIONS, ask_predictions, cfg, collecting, go, lab, log, seed_for, shown
 
 # ---------------------------------------------------------------------------
 # consent
@@ -35,8 +35,9 @@ research.
 - **Anonymous.** We do not record your name, email, student ID or IP address. You will create a code from three
   answers only you know; we store a scrambled version of it, which lets us link your answers across sessions but
   not identify you.
-- **What is stored:** your answers to the concept check and survey, your predictions and decisions in the missions,
-  how long steps took, and any short written reflections.
+- **What is stored:** your answers to the concept check and survey; the experiments you design in the Process Lab
+  (your settings, predictions and results) and your decisions in the missions; how long steps took; and any short
+  written notes.
 - **Your choices:** you can skip any question and stop at any time. {c.data_access_note}
 - **Risks and benefits:** there are no risks beyond those of a normal class activity. You may learn the course
   material more deeply; the results may improve how quality management is taught.
@@ -86,25 +87,26 @@ def code_view() -> None:
 def home_view() -> None:
     L = lab()
     st.title("🎓 Learning Lab")
-    st.markdown("#### Learn quality management by making the decisions yourself.")
-    st.write("Each mission puts you in a manager's seat. You will "
-             + ("**predict** what happens, **decide**, see the **result**, and then **explain** it. " if ask_predictions()
-                else "**decide**, see the **result**, and then **explain** it. ")
-             + "Mistakes are part of the design: they are where the learning happens.")
+    st.markdown("#### Learn quality management by experimenting.")
+    st.write("In the **Process Lab** you set up a process of your own, decide what goes wrong, choose how to watch "
+             "it and run the experiment: every number and chart comes from your settings. "
+             + ("Before each run you **predict** what will happen, then compare. " if ask_predictions() else "")
+             + "Surprises are part of the design: they are where the learning happens.")
     if collecting():
         st.caption(f"Research participation: on · your code **{L['pid']}** (write it down if you want to withdraw later)")
     elif cfg().active and L["consent"] is False:
         st.caption("Research participation: off. Nothing you do here is stored.")
 
     done = L["done"]
-    n_done = sum(m in done for m in ORDER)
-    st.progress(n_done / len(ORDER), text=f"{n_done} of {len(ORDER)} missions complete")
+    pl = L["m"].get("processlab", {})
+    n_exp = len(pl.get("history", []))
+    n_guided = sum(m in done for m in GUIDED)
 
     with st.container(border=True):
         a, b = st.columns([4, 1])
         a.markdown("**Step 1 · Warm-up check** (12 questions, about 6 minutes)  \n"
                    "See what you already know. You won't see the answers yet; you'll take the same check at the end."
-                   + ("  \n*Coming back for a second session? Skip this and go straight to the missions.*"
+                   + ("  \n*Coming back for a second session? Skip this and go straight to the Process Lab.*"
                       if collecting() and L["pre"] is None else ""))
         if L["pre"] is None:
             if b.button("Start", key="go_pre", type="primary", width="stretch"):
@@ -112,25 +114,40 @@ def home_view() -> None:
         else:
             b.success("Done")
 
-    st.markdown("**Step 2 · Missions** (any order)")
-    cols = st.columns(3)
-    for i, key in enumerate(ORDER):
-        m = MISSIONS[key]
-        with cols[i % 3].container(border=True, height=275):
-            st.markdown(f"**{m['icon']} {m['title']}**")
-            st.caption(f"{m['topic']} · ~{m['minutes']} min")
-            st.write(m["hook"])
-            label = "✓ Review" if key in done else ("Continue" if key in L["m"] else "Start")
-            if st.button(label, key=f"go_{key}", width="stretch", type="secondary" if key in done else "primary"):
-                go(key)
+    with st.container(border=True):
+        a, b = st.columns([4, 1])
+        m = MISSIONS["processlab"]
+        a.markdown(f"**Step 2 · {m['icon']} {m['title']}** (as long as you like; 30 minutes is a good start)  \n"
+                   "Set up any process: what is measured, its target and specification, how much it varies. Decide "
+                   "what goes wrong and when: a shift, a drift, more variation, an outlier. Choose the chart, the rules "
+                   "and the sample size. Predict, run, compare, change one thing, run again.")
+        if n_exp:
+            a.caption(f"{n_exp} experiment{'s' if n_exp != 1 else ''} so far"
+                      + (" · finished" if "processlab" in done else ""))
+        if b.button("Continue" if n_exp else "Open", key="go_processlab", type="primary", width="stretch"):
+            go("processlab")
+
+    with st.expander(f"Optional: six short guided missions ({n_guided} of {len(GUIDED)} done)"):
+        st.caption("Classic quality-management experiences in about 10 to 15 minutes each: Deming's red beads, "
+                   "spotting signals, the funnel, capability, cost of quality and the economics of monitoring.")
+        cols = st.columns(3)
+        for i, key in enumerate(GUIDED):
+            m = MISSIONS[key]
+            with cols[i % 3].container(border=True, height=275):
+                st.markdown(f"**{m['icon']} {m['title']}**")
+                st.caption(f"{m['topic']} · ~{m['minutes']} min")
+                st.write(m["hook"])
+                label = "✓ Review" if key in done else ("Continue" if key in L["m"] else "Start")
+                if st.button(label, key=f"go_{key}", width="stretch", type="secondary"):
+                    go(key)
 
     with st.container(border=True):
         a, b = st.columns([4, 1])
         a.markdown("**Step 3 · Final check and feedback** (about 8 minutes)  \n"
                    "Retake the check to see how much you learned, with explanations, then tell us what worked.")
         if L["post"] is None:
-            if b.button("Start", key="go_post", width="stretch", disabled=n_done == 0,
-                        help="Complete at least one mission first."):
+            if b.button("Start", key="go_post", width="stretch", disabled=not (n_exp or done),
+                        help="Run at least one experiment (or a mission) first."):
                 go("post")
         elif L["survey"] is None:
             if b.button("Feedback", key="go_survey", width="stretch", type="primary"):

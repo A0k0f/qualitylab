@@ -186,3 +186,131 @@ def dprime_chart(phases: dict, ax=None):
 
 
 
+
+
+# ---------------------------------------------------------------------------
+# Process Lab
+# ---------------------------------------------------------------------------
+
+CHANGE_COLORS = {"shift": "#eb6834", "drift": "#8a5cd6", "spread": "#0f9e8e", "outlier": "#b5832a"}
+
+
+def process_lab_figure(exp, r):
+    """Top: what really happened (every unit, the true average, spec limits).
+    Middle: what the chart saw (limits, baseline, signals, fixes). Bottom: the spread chart, if any."""
+    import matplotlib.pyplot as plt
+
+    P = exp.process
+    main, disp = r["main"], r["disp"]
+    m = P.samples
+    x = np.arange(1, m + 1)
+    rows = 3 if disp is not None and exp.monitor.chart == "shewhart" else 2
+    fig, axs = plt.subplots(rows, 1, figsize=(11, 2.9 * rows + 0.4), sharex=True,
+                            gridspec_kw=dict(height_ratios=[1.15] + [1] * (rows - 1)))
+    for ax in axs:
+        _style(ax)
+        ax.axvspan(0.5, P.baseline + 0.5, color=GRID, alpha=0.55, lw=0, zorder=0)
+        for c in exp.changes:
+            ax.axvline(c.at - 0.5, color=CHANGE_COLORS.get(c.kind, INK_3), lw=1.4, ls=(0, (4, 2)), zorder=1)
+
+    # 1 · reality
+    ax = axs[0]
+    X = r["X"]
+    xs = np.repeat(x, X.shape[1])
+    ax.scatter(xs, X.ravel(), s=6, color=INK_3, alpha=0.45, lw=0, zorder=2, label="each unit measured")
+    ax.fill_between(x, r["mu"] - 3 * r["sd"], r["mu"] + 3 * r["sd"], step="mid", color=SERIES_2, alpha=0.12, lw=0,
+                    zorder=1, label="true range of 99.7 % of units")
+    ax.plot(x, r["mu"], color=SERIES_2, lw=2.2, zorder=4, drawstyle="steps-mid", label="true process average")
+    for lim, nm in ((P.lsl, "LSL"), (P.usl, "USL")):
+        if lim is not None:
+            ax.axhline(lim, color=CRITICAL, lw=1.3, ls=(0, (6, 3)))
+            ax.text(m + 0.8, lim, f" {nm}", va="center", fontsize=8, color=CRITICAL, clip_on=False)
+    ax.axhline(P.target, color=INK_3, lw=0.8)
+    ax.set_ylabel(P.unit, color=INK_2)
+    ax.set_title("What really happened", loc="left", fontsize=11, fontweight="bold", color=INK)
+    ax.text(P.baseline / 2 + 0.5, 0.03, "baseline (setting up the chart)", transform=ax.get_xaxis_transform(),
+            ha="center", va="bottom", fontsize=8, color=INK_2)
+    for c in exp.changes:
+        ax.text(c.at - 0.3, 1.0, c.kind, transform=ax.get_xaxis_transform(), ha="left", va="bottom", fontsize=8,
+                color=CHANGE_COLORS.get(c.kind, INK_3), fontweight="bold")
+    ax.legend(loc="upper left", bbox_to_anchor=(0, -0.02), fontsize=8, frameon=False, ncol=3)
+
+    # 2 · the chart
+    ax = axs[1]
+    stat = main.statistic
+    if main.kind == "cusum":
+        ax.plot(x, stat, color=SERIES, lw=1.6, marker="o", ms=3, label="C⁺ (upward)")
+        ax.plot(x, main.extra["C_minus"], color=SERIES_2, lw=1.6, marker="o", ms=3, label="−C⁻ (downward)")
+        H = main.params["H"]
+        for v in (H, -H):
+            ax.axhline(v, color=INK, lw=1.2, ls=(0, (5, 3)))
+        ax.axhline(0, color=INK_2, lw=1)
+        ax.legend(loc="upper left", fontsize=8, frameon=False, ncol=2)
+        pts = np.where(np.abs(stat) >= np.abs(main.extra["C_minus"]), stat, main.extra["C_minus"])
+    else:
+        ax.plot(x, stat, color=SERIES, lw=1.6, marker="o", ms=3.5, zorder=3)
+        ax.plot(x, main.center, color=INK_2, lw=1.1)
+        ax.plot(x, main.ucl, color=INK, lw=1.2, ls=(0, (5, 3)))
+        ax.plot(x, main.lcl, color=INK, lw=1.2, ls=(0, (5, 3)))
+        for v, nm in ((main.ucl[-1], "UCL"), (main.center[-1], "CL"), (main.lcl[-1], "LCL")):
+            ax.text(m + 0.8, v, f" {nm}", va="center", fontsize=8, color=INK_2, clip_on=False)
+        pts = stat
+    sig = np.array(r["signals"], int) - 1
+    own = np.intersect1d(sig, main.out_of_control)
+    if own.size:
+        ax.scatter(x[own], pts[own], s=95, facecolor="none", edgecolor=CRITICAL, lw=2, zorder=5)
+    for s in r["fixed"].values():
+        ax.annotate("fixed", (s, 1.0), xycoords=("data", "axes fraction"), ha="center", va="bottom", fontsize=8,
+                    color=GOOD, fontweight="bold")
+        ax.axvline(s + 0.5, color=GOOD, lw=1.2)
+    name = {"Xbar": "X̄ chart (sample averages)", "I": "Individuals chart", "EWMA": "EWMA chart of sample averages",
+            "CUSUM": "CUSUM chart of sample averages"}.get(main.name, main.name)
+    if exp.process.n == 1 and main.name in ("EWMA", "CUSUM"):
+        name = name.replace(" of sample averages", "")
+    ax.set_title(f"What your chart saw: {name}", loc="left", fontsize=11, fontweight="bold", color=INK)
+
+    # 3 · spread
+    if rows == 3:
+        ax = axs[2]
+        ax.plot(x, disp.statistic, color=SERIES, lw=1.4, marker="o", ms=3)
+        ax.plot(x, disp.center, color=INK_2, lw=1.1)
+        ax.plot(x, disp.ucl, color=INK, lw=1.2, ls=(0, (5, 3)))
+        if np.any(disp.lcl > 0):
+            ax.plot(x, disp.lcl, color=INK, lw=1.2, ls=(0, (5, 3)))
+        o = disp.out_of_control
+        if o.size:
+            ax.scatter(x[o], disp.statistic[o], s=95, facecolor="none", edgecolor=CRITICAL, lw=2, zorder=5)
+        ax.set_title(f"Spread within each sample ({disp.name} chart)", loc="left", fontsize=11, fontweight="bold",
+                     color=INK)
+    axs[-1].set_xlabel("sample number", color=INK_2)
+    axs[-1].set_xlim(0.3, m + 0.7)
+    fig.tight_layout()
+    return fig
+
+
+def replication_figure(rep, exp):
+    """Histogram of detection delays for each change across many runs."""
+    import matplotlib.pyplot as plt
+
+    k = len(rep["changes"])
+    fig, axs = plt.subplots(1, max(1, k), figsize=(5.2 * max(1, k), 2.9), squeeze=False)
+    for j, ax in enumerate(axs[0]):
+        _style(ax)
+        if k == 0:
+            ax.text(0.5, 0.5, "No changes in this experiment", ha="center", va="center", transform=ax.transAxes,
+                    color=INK_2)
+            ax.set_xticks([])
+            ax.set_yticks([])
+            continue
+        d = np.array(rep["changes"][j]["delays"])
+        c = exp.changes[j]
+        if d.size:
+            bins = np.arange(0.5, d.max() + 1.5, max(1, int(np.ceil(d.max() / 30))))
+            ax.hist(d, bins=bins, color=CHANGE_COLORS.get(c.kind, SERIES), alpha=0.85)
+            ax.axvline(np.median(d), color=INK, lw=1.4, ls=(0, (4, 2)))
+        ax.set_title(f"{c.kind} at sample {c.at}: caught in {rep['changes'][j]['detected']:.0%} of {rep['reps']} runs",
+                     loc="left", fontsize=10, fontweight="bold", color=INK)
+        ax.set_xlabel("samples until the chart signaled", color=INK_2)
+        ax.set_ylabel("runs", color=INK_2)
+    fig.tight_layout()
+    return fig

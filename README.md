@@ -10,7 +10,7 @@ Every operation, from a filling line to a warehouse or an accounts-payable team,
 
 It has five parts:
 
-* **🎓 Learning Lab (for students).** Six short missions in which business students make quality decisions and live with the consequences: manage workers in Deming's red bead factory, tell signals from noise on sixteen business charts, run a filling machine by hand, rescue a customer contract with Cp and Cpk, spend a quality budget, and design an inspection plan. Each mission follows *predict → decide → observe → explain*, with a concept check before and after. No statistics background needed. An optional, consent-based **research kit** lets instructors study how much students learn, with an IRB-ready design and anonymous data collection.
+* **🎓 Learning Lab (for students).** In the **Process Lab**, students set up any process of their own (target, specification limits, variation, sample size, costs), decide what goes wrong and when (shifts, drifts, more variation, outliers), choose how to watch it (Shewhart, EWMA or CUSUM; run rules; estimated or known limits; reacting to signals or not), predict the outcome and run the experiment. Every number and chart is generated from their settings. They can re-run with new random data, run a design 200 times, change one thing and compare. Six short guided missions (Deming's red beads, the funnel and more) are optional extras. An optional, consent-based **research kit** records every experiment design, prediction and outcome anonymously, with an IRB-ready study design.
 * **🧭 Decision Studio (for managers).** Describe a process in plain terms: volume, what goes wrong and how often, what mistakes cost, how you check today. A Monte Carlo simulator replays years of operation under hundreds of monitoring and inspection plans. It recommends the cheapest plan that meets your limits (and a simpler one that is nearly as cheap), with the expected saving and its range. It also tests whether the answer survives if your estimates are off, finds the best process aim (overfill vs. out-of-spec), and prices improvement investments. Six editable industry scenarios are included.
 * **📈 SPC Toolkit (for analysts and classes).** Upload data or open a practice scenario and get the right control chart (X̄-R, X̄-S, I-MR, p, np, c, u, Laney p′/u′, EWMA, CUSUM, Hotelling T²) with all eight run rules, capability with confidence intervals, and Pareto, each with a plain-language reading.
 * **A tested Python library** behind both (about 100 tests), validated against textbook tables and published run-length results.
@@ -18,35 +18,36 @@ It has five parts:
 
 ## Learning Lab
 
-![Learning Lab missions](docs/img/learning_lab_home.png)
+![Process Lab: a student's experiment](docs/img/learning_lab_processlab.png)
 
-| Mission | Students... | ...and discover |
-|---|---|---|
-| 🔴 The Red Bead Factory | reward, warn or fire six workers based on their defects, then pick one change to the system | the differences came from the system; the "improvement" after a warning was regression to the mean |
-| 📡 Signal or Noise? | decide whether to investigate 16 control charts from 8 businesses, with money on each call, before and after learning the run rules | patterns matter more than single points; their own signal-detection score (d′) |
-| 🎯 The Tampering Trap | run a filling machine by hand, then compare Deming's four funnel rules | adjusting a stable process after every unit makes it worse |
-| 📏 Keep the Customer | find the cheapest way to reach the Cpk ≥ 1.33 a customer demands | control limits are not specification limits; centering beats buying a new machine; inspection does not create capability |
-| 💰 Where Does the Money Go? | classify costs of quality and spend a $40,000 budget on improvement projects | rank problems by cost, not count; the best portfolio is not what rules of thumb pick |
-| 🧭 Be the Quality Manager | design a monitoring plan for a bottling line and see its cost over a simulated year | checking is an investment with a measurable return |
+*A student's experiment.* The student set up a bottle-filling process (target 12 oz, specification 11.85–12.15, σ = 0.04, samples of 4), made the average shift by 0.04 oz at sample 31 and the variation grow 1.8× at sample 45, and watched it with an X̄-R chart and Western Electric rules, reacting to signals. Top: what really happened. Middle and bottom: what the chart saw, when it signaled, and when the cause was removed. Below the chart the app compares the student's prediction with the outcome, explains it in plain language, and prices it.
 
-| The reveal in the red bead factory | Signal or noise? |
+| In the Process Lab, students... | ...and can find out, for example |
 |---|---|
-| ![](docs/img/learning_lab_redbeads.png) | ![](docs/img/learning_lab_signals.png) |
+| define a process: target, specification, variation, centring, sample size, volume, costs | why a stable process can still ship defects (capability is not control) |
+| make things go wrong: shifts, drifts, more variation, outliers, at times they choose | how detection speed depends on the size of the change and the sample size |
+| choose Shewhart (I-MR, X̄-R, X̄-S), EWMA or CUSUM, the run rules, estimated or known limits | when EWMA and CUSUM beat a Shewhart chart, and when they miss what it catches |
+| predict detection, delay, false alarms and defects before every run | how well their intuition matches reality, experiment after experiment |
+| re-run with new random data, or run a design 200 times | that one run is not evidence; what the typical result is |
+| price every run: measuring, investigations, defects reaching customers | what fast detection and false alarms are worth |
 
-Every "right answer" the missions teach is checked by tests: the red bead distribution and the regression-to-the-mean figures, the funnel rules' theoretical spread, the ground truth of every generated chart under the taught rules (across many seeds), the cheapest capability fix, the exact knapsack optimum for the project budget, and the best monitoring plan. See `tests/test_learn.py`.
+The guided missions remain available as optional extras: the Red Bead Factory, Signal or Noise?, the Tampering Trap (Deming's funnel), Keep the Customer (Cp and Cpk), Where Does the Money Go? (cost of quality) and Be the Quality Manager.
 
-**For instructors.** A [teaching guide](labs/learning_lab.md) maps the missions to course objectives and suggests schedules and debrief questions. The **Instructor** page shows anonymous, class-level results for debriefing (e.g. how many students warned the worker with the most red beads, and what happened to that worker the next day).
+The Process Lab's results are checked against SPC theory (`tests/test_process_lab.py`): in-control false-alarm rates match 2Φ(−3), detection delays match the average run length of the X̄ and R charts combined, EWMA and CUSUM beat a Shewhart chart on small shifts, reacting to a signal restores the process, out-of-spec shares and costs match closed forms, and every run is reproducible from its seed. Every "right answer" the missions teach is checked too: the red bead distribution and the regression-to-the-mean figures, the funnel rules' theoretical spread, the ground truth of every generated chart under the taught rules (across many seeds), the cheapest capability fix, the exact knapsack optimum for the project budget, and the best monitoring plan. See `tests/test_learn.py`.
+
+**For instructors.** A [teaching guide](labs/learning_lab.md) has open questions for students, schedules, an assignment and debrief ideas. The password-protected **Instructor** page shows anonymous, class-level results: how many experiments students ran, which settings they changed, whether they changed one thing at a time, whether their predictions improved, and the mission results.
 
 ### Research kit (optional, off by default)
 
 For instructors who want to publish what students learn, the [research kit](docs/research/) provides:
 
 * **Consent-gated, anonymous collection.** Nothing is stored unless the deployment is configured with an IRB protocol number and the student agrees and confirms they are 18 or older. Students who decline get the same Learning Lab. No names, emails, student IDs or IP addresses are collected; students are linked across sessions by a salted hash of a self-generated code.
-* **A study design ready to adapt:** pre/post concept check, within-mission decision measures (d′, tampering slope, portfolio optimality, plan regret), confidence calibration, System Usability Scale, and an optional randomised comparison of *predicting first* vs. not.
+* **One row per experiment:** the full design, what changed since the student's previous experiment, the goal, the prediction, the outcome, replication and the student's note; every run is reproducible from its logged seed. This is the data for studying *how* students experiment (controlled comparisons, replication, learning from prediction errors).
+* **A study design ready to adapt:** pre/post concept check, experimentation measures, prediction learning curves, confidence calibration, System Usability Scale, mission measures, and an optional randomised comparison of *predicting first* vs. not.
 * **Your own data store:** a Google Apps Script that writes to a Google Sheet you own (or any HTTPS endpoint, e.g. Power Automate).
 * **Analysis:** `scripts/analyze_learning_lab.py` produces participant tables, item statistics, paired tests with effect sizes and CIs, ANCOVA for the condition effect, and a short report. It runs on synthetic data out of the box.
 
-![Instructor debrief view (synthetic preview)](docs/img/learning_lab_instructor.png)
+![Instructor view, Process Lab tab (synthetic preview)](docs/img/learning_lab_instructor.png)
 
 ## Decision Studio
 
@@ -175,7 +176,7 @@ Every chart returns a `ChartResult` with `.statistic`, `.center`, `.ucl`, `.lcl`
 
 ```bash
 pip install -e ".[dev]"
-pytest -m "not slow"   # ~160 fast tests, including full headless playthroughs of the Learning Lab
+pytest -m "not slow"   # ~175 fast tests, including full headless playthroughs of the Learning Lab
 pytest -m slow         # Monte Carlo ARL checks against published values
 ```
 
@@ -183,7 +184,7 @@ pytest -m slow         # Monte Carlo ARL checks against published values
 
 ```text
 src/qualitylab/        library (charts, rules, capability, multivariate, ARL, datasets, simulate, decide, plotting)
-src/qualitylab/learn/  Learning Lab engines (red beads, signals, funnel, capability, Pareto, manager, concept check)
+src/qualitylab/learn/  Learning Lab engines (Process Lab simulator; missions; concept check)
 src/qualitylab/research*.py  consent-gated logging and analysis for the research kit
 app/                   Streamlit app: Home, Learning Lab, Decision Studio, SPC Toolkit, Instructor dashboard
 case_studies/secom/    case study on a public semiconductor dataset

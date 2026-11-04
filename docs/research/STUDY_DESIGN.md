@@ -6,22 +6,28 @@ A ready-to-adapt design for a classroom study built on the Learning Lab. It is w
 
 Undergraduate business students often learn statistical process control and Deming's management philosophy as definitions to memorise. Classic misconceptions persist after instruction: blaming individuals for system variation, adjusting a stable process after every measurement (tampering), confusing control limits with specification limits, and treating inspection as a substitute for capability. Physical simulations such as Deming's red bead experiment and Nelson's funnel are known to confront these misconceptions, but they take class time, run once, and leave no individual record of what each student believed.
 
-The Learning Lab turns six of these classic demonstrations into short, individual "missions" in which students make management decisions, see the consequences, and explain them. Each mission follows a **predict → decide → observe → explain** cycle. The predict step draws on research showing that generating a prediction before seeing an outcome improves conceptual learning (e.g., Crouch et al., 2004; Brod, 2021; Kapur, 2016 on productive failure).
+The centre of the Learning Lab is the **Process Lab**, an open simulation environment. Each student defines a process (what is measured, target, specification limits, unit-to-unit variation, centring, sample size, costs), decides what goes wrong and when (sudden shifts, gradual drifts, increased variation, single outliers, or nothing), designs the monitoring (Shewhart, EWMA or CUSUM chart; run rules; limits estimated from a baseline or known; reacting to signals or not), predicts the outcome, and runs the experiment. The data, charts and outcomes are generated from the student's own settings with the validated QualityLab chart functions, so there is no fixed scenario and no answer key: each student's sequence of experiments is their own. Students can re-run a design with new random data, run it 200 times to see the distribution of outcomes, change one thing and run again, and write a note on what they learned.
+
+This produces a rich, fully reproducible record of *how* novices experiment with a quality system: which factors they vary, whether they make controlled (one-factor) comparisons, whether they replicate before drawing conclusions, and whether their predictions about detection, false alarms and defects improve with experience. Each experiment follows a **predict → run → compare → explain** cycle, drawing on research showing that generating a prediction before seeing an outcome improves conceptual learning (e.g., Crouch et al., 2004; Brod, 2021) and on research on scientific reasoning and the control-of-variables strategy (Chen & Klahr, 1999; de Jong & van Joolingen, 1998).
+
+Six short guided missions (Deming's red beads, signal-or-noise judgments, the funnel, capability, cost of quality, monitoring economics) are available as optional extras.
 
 ## Research questions
 
 * **RQ1 (learning).** Do students' scores on a 12-item concept check about quality management improve from before to after the Learning Lab? Which misconceptions change most and which persist?
-* **RQ2 (prediction).** Does asking students to predict before seeing each result produce larger learning gains than the same missions without prediction? *(Optional randomised component.)*
-* **RQ3 (decision quality).** Within missions, do students' decisions improve with feedback? For example: does their ability to tell signals from noise on control charts (d′) improve between the first and second round of eight charts; do they find the cheapest way to meet a capability target; how close do their project portfolios get to the optimal one?
-* **RQ4 (calibration).** How well does students' confidence match their accuracy before and after?
-* **RQ5 (experience).** How usable do students find the tool (System Usability Scale), and what do they say helped or confused them?
+* **RQ2 (experimentation strategies).** How do business students experiment with a process-monitoring system? How many experiments do they run, which settings do they vary, how often do they make controlled one-factor comparisons, and how often do they replicate before concluding? Do these strategies relate to concept gains?
+* **RQ3 (learning from experience).** Do students' predictions of detection, detection delay, false alarms and out-of-spec output become more accurate over successive experiments?
+* **RQ4 (prediction).** Does asking students to predict before each run produce larger learning gains than the same activity without prediction? *(Optional randomised component.)*
+* **RQ5 (guided missions, if used).** Within missions, do students' decisions improve with feedback (e.g., signal-detection d′ between two rounds; finding the cheapest way to meet a capability target; portfolio optimality)?
+* **RQ6 (calibration).** How well does students' confidence match their accuracy, in the concept check and in their experiment predictions?
+* **RQ7 (experience).** How usable do students find the tool (System Usability Scale), and what do they say helped or confused them?
 
 ## Design
 
-Single-group pre/post design (RQ1, RQ3–RQ5), with an optional embedded two-arm randomised comparison (RQ2).
+Single-group pre/post design with process data from every experiment (RQ1–RQ3, RQ5–RQ7), with an optional embedded two-arm randomised comparison (RQ4).
 
-* **Pre-test:** 12-item concept check with confidence ratings (warm-up, before any mission).
-* **Intervention:** six missions, any order, about 60 to 75 minutes in total.
+* **Pre-test:** 12-item concept check with confidence ratings (warm-up, before any activity).
+* **Intervention:** the Process Lab (open-ended; 30 to 45 minutes is a good class session), optionally followed by any of the six guided missions.
 * **Post-test:** the same 12 items, in a different order.
 * **Survey:** SUS (10 items), six learning items, two open questions.
 
@@ -36,13 +42,17 @@ Students enrolled in the course who are 18 or older and choose to take part. No 
 1. The instructor posts the app link. Students open **Learning Lab** in a browser.
 2. The consent screen explains the study. Students tick "I am 18 or older" and choose **I agree** or **No thanks**. Both choices lead to the same activity.
 3. Participants create an anonymous code from three questions only they can answer. The app shows them the resulting code (e.g., `P-3F9A0C12BD`) so they can withdraw later.
-4. Warm-up check → missions → final check → feedback survey.
+4. Warm-up check → Process Lab (and optional missions) → final check → feedback survey.
 5. Students can download their own learning record at any time.
 
 ## Measures
 
 | Measure | Source | Notes |
 |---|---|---|
+| Every experiment: full design, what changed since the previous one, goal, prediction, outcome, replication, note | Process Lab | One row per experiment (`experiments()`); every run is reproducible from its logged seed |
+| Controlled comparisons | Process Lab | Share of follow-up experiments changing exactly one setting |
+| Replication | Process Lab | Whether a design was run 200 times before moving on |
+| Prediction accuracy over experiments | Process Lab | Detection correct; delay error abs(log(predicted / actual)), which does not depend on the size of the delay; false-alarm and out-of-spec errors |
 | Concept score (0–1), per item correct, confidence 1–5 | Pre and post checks | 12 items mapped to course objectives; see `src/qualitylab/learn/concepts.py` |
 | Normalised gain ⟨g⟩ = (post − pre)/(1 − pre) | Derived | Hake (1998) |
 | System-cause attribution | Red beads, "why" question | Correct = the system (the bead mix), not the workers |
@@ -65,13 +75,15 @@ All measures are produced automatically by `qualitylab.research_analysis.partici
 ## Analysis plan
 
 * **RQ1:** paired t-test of pre vs. post score, with Wilcoxon signed-rank as a check; Cohen's d_z with 95 % CI; class and mean individual normalised gain. Item-level McNemar-style comparison of the share correct before and after (reported descriptively for 12 items).
-* **RQ2:** Welch t-test of gain (or ANCOVA of post score on pre score and condition) between conditions. Report the effect with a CI regardless of significance.
-* **RQ3:** paired comparison of d′ between rounds A and B; proportions finding the cheapest capability fix and the optimal portfolio; first vs. best attempt.
-* **RQ4:** mean confidence on correct vs. incorrect items, pre and post.
-* **RQ5:** SUS mean and distribution (68 is the usual benchmark); thematic coding of open responses by two coders.
+* **RQ2:** descriptive statistics of the experiment table (experiments per student, settings varied, one-factor share, replication); sequence analysis of the `changed` field; correlation (or regression with pre-test as covariate) of one-factor share and replication with normalised gain.
+* **RQ3:** prediction errors by experiment number (learning curve); paired comparison of each student's first and second half of experiments; a mixed-effects model with experiment number as fixed effect and student as random effect is the stronger analysis when n allows.
+* **RQ4:** Welch t-test of gain and ANCOVA of post score on pre score and condition. Report the effect with a CI regardless of significance.
+* **RQ5:** paired comparison of d′ between rounds; proportions finding the cheapest capability fix and the optimal portfolio; first vs. best attempt.
+* **RQ6:** mean confidence on correct vs. incorrect answers and predictions.
+* **RQ7:** SUS mean and distribution (68 is the usual benchmark); thematic coding of open responses and experiment notes by two coders.
 * Missing data: analyses use all available participants per measure and report n for each. Participants with both checks form the RQ1 sample.
 
-`scripts/analyze_learning_lab.py` runs the RQ1–RQ3 and RQ5 statistics and writes a short report.
+`scripts/analyze_learning_lab.py` writes the participant and experiment tables, runs the RQ1–RQ7 statistics and writes a short report.
 
 ## Risks, privacy and the dual role of the instructor
 
@@ -95,6 +107,8 @@ All measures are produced automatically by `qualitylab.research_analysis.partici
 * Crouch, C. H., Fagen, A. P., Callan, J. P., & Mazur, E. (2004). Classroom demonstrations: learning tools or entertainment? *American Journal of Physics* 72(6), 835–838.
 * Deming, W. E. (1986). *Out of the Crisis*. MIT Press.
 * Goetsch, D. L., & Davis, S. B. *Quality Management for Organizational Excellence: Introduction to Total Quality* (9th ed.). Pearson.
+* Chen, Z., & Klahr, D. (1999). All other things being equal: acquisition and transfer of the control of variables strategy. *Child Development* 70(5), 1098–1120.
+* de Jong, T., & van Joolingen, W. R. (1998). Scientific discovery learning with computer simulations of conceptual domains. *Review of Educational Research* 68(2), 179–201.
 * Hake, R. R. (1998). Interactive-engagement versus traditional methods. *American Journal of Physics* 66(1), 64–74.
 * Hautus, M. J. (1995). Corrections for extreme proportions and their biasing effects on estimated values of d′. *Behavior Research Methods* 27(1), 46–51.
 * Kapur, M. (2016). Examining productive failure, productive success, unproductive failure, and unproductive success in learning. *Educational Psychologist* 51(2), 289–299.

@@ -1,4 +1,4 @@
-"""Learning Lab page: guided missions for students, with optional consent-based research logging."""
+"""Learning Lab page: the Process Lab and guided missions for students, with optional consent-based research logging."""
 from __future__ import annotations
 
 import sys
@@ -11,10 +11,10 @@ for p in (ROOT / "src", ROOT / "app"):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from lablib import home, m_capability, m_funnel, m_manager, m_pareto, m_redbeads, m_signals  # noqa: E402
-from lablib.core import MISSIONS, ORDER, cfg, collecting, go, lab  # noqa: E402
+from lablib import home, m_capability, m_funnel, m_manager, m_pareto, m_processlab, m_redbeads, m_signals  # noqa: E402,I001
+from lablib.core import GUIDED, MISSIONS, cfg, collecting, go, lab  # noqa: E402
 
-PAGES = {"redbeads": m_redbeads.run, "signals": m_signals.run, "funnel": m_funnel.run,
+PAGES = {"processlab": m_processlab.run, "redbeads": m_redbeads.run, "signals": m_signals.run, "funnel": m_funnel.run,
          "capability": m_capability.run, "pareto": m_pareto.run, "manager": m_manager.run}
 
 L = lab()
@@ -24,7 +24,10 @@ with st.sidebar:
     st.markdown("**Learning Lab progress**")
     marks = []
     marks.append(("✅" if L["pre"] else "⬜") + " Warm-up check")
-    for k in ORDER:
+    n_exp = len(L["m"].get("processlab", {}).get("history", []))
+    marks.append(("✅" if "processlab" in L["done"] else ("▶️" if n_exp else "⬜"))
+                 + f" Process Lab{f' ({n_exp} runs)' if n_exp else ''}")
+    for k in GUIDED:
         marks.append(("✅" if k in L["done"] else ("▶️" if k in L["m"] else "⬜")) + f" {MISSIONS[k]['title']}")
     marks.append(("✅" if L["post"] else "⬜") + " Final check")
     st.markdown("  \n".join(marks))

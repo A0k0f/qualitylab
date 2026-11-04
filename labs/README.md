@@ -2,13 +2,13 @@
 
 Materials for an undergraduate quality-management course (written for a senior-level business course on managing quality). Everything uses the QualityLab web app, so **students need no coding and no installation**: a browser is enough.
 
-**Start with the [Learning Lab](learning_lab.md).** Six short missions (red beads, signal or noise, the funnel, capability, cost of quality, monitoring economics) build the intuition behind the course, with a concept check before and after. The guide covers schedules, debrief questions and an optional graded reflection.
+**Start with the [Learning Lab](learning_lab.md).** In its Process Lab, students set up their own process, decide what goes wrong, choose how to watch it, predict and run experiments; every result is generated from their settings. Six short guided missions (red beads, signal or noise, the funnel, capability, cost of quality, monitoring economics) are optional extras, and a concept check runs before and after. The guide has open questions for students, schedules, debrief ideas and an assignment.
 
 Then the four labs build technical skill: Labs 1–3 use the **SPC Toolkit**; Lab 4 uses the **Decision Studio**.
 
 | Lab | Topic | Scenarios | Deliverable |
 |---|---|---|---|
-| [Learning Lab](learning_lab.md) | Deming, common vs. special causes, tampering, capability, cost of quality, monitoring economics | Six missions | Optional one-page reflection |
+| [Learning Lab](learning_lab.md) | Variation, control charts and run rules, EWMA/CUSUM, capability, cost of quality, monitoring design; Deming (missions) | Students' own processes and experiments (Process Lab); six optional missions | Experiments CSV and a one-page memo |
 | [Lab 1](lab1_variables_charts.md) | Variables charts, Phase I/II, run rules, EWMA/CUSUM | Cold-brew filling; call-center waits | Memo to an operations manager |
 | [Lab 2](lab2_attribute_charts.md) | p, np, c, u charts; Laney p′; showing an improvement | Invoice errors; e-commerce returns; circuit boards; hotel complaints | Answers plus a recommendation |
 | [Lab 3](lab3_capability_pareto.md) | Capability (Cp, Cpk, Pp, Ppk), Pareto | Machined shafts; cold-brew filling; complaint reasons | Improvement proposal |

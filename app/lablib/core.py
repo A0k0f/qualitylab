@@ -32,8 +32,12 @@ MISSIONS = {
     "manager": dict(title="Be the Quality Manager", icon="🧭", minutes=10,
                     topic="Decision-making for quality · economics of monitoring",
                     hook="Design the inspection plan for a bottling line and see what it costs over a year."),
+    "processlab": dict(title="Process Lab", icon="🧪", minutes=30,
+                       topic="Your own experiments · SPC, monitoring design, cost of quality",
+                       hook="Set up any process, decide what goes wrong, choose how to watch it, predict, run."),
 }
 ORDER = list(MISSIONS)
+GUIDED = [k for k in ORDER if k != "processlab"]  # the six guided missions
 
 
 # ---------------------------------------------------------------------------

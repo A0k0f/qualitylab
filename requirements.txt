@@ -3,5 +3,5 @@ numpy>=1.24
 pandas>=2.0
 scipy>=1.10
 matplotlib>=3.7
-streamlit>=1.40
+streamlit==1.66.1   # pinned: a version change between deploys breaks open browser tabs
 openpyxl>=3.1

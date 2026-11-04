@@ -1,6 +1,7 @@
 """Instructor & researcher dashboard for the Learning Lab (password protected)."""
 from __future__ import annotations
 
+import hmac
 import io
 import json
 import sys
@@ -21,8 +22,51 @@ from qualitylab import research_analysis as RA  # noqa: E402
 from qualitylab.learn import concepts as C  # noqa: E402
 from qualitylab.plotting import INK, INK_2, INK_3, SERIES, SERIES_2, _style  # noqa: E402
 
+
+@st.cache_data(show_spinner=False)
+def _synthetic(n: int) -> list[dict]:
+    return RA.synthetic_events(n, seed=1)
+
+
 st.title("🔒 Instructor & research dashboard")
 cfg = research.load_config()
+
+
+def _password() -> str:
+    """Top-level ``instructor_password`` in the app's secrets (or the one inside ``[research]``)."""
+    try:
+        top = str(st.secrets.get("instructor_password", "") or "")
+    except Exception:  # noqa: BLE001 - no secrets file at all
+        top = ""
+    return top or cfg.instructor_password
+
+
+# ---- the whole page is locked: nothing below runs without the password ---------------------------
+PASSWORD = _password()
+if not PASSWORD:
+    st.info("This page is for the course instructor and is locked. To use it, the app owner adds a line "
+            "`instructor_password = \"...\"` at the top of the app's Secrets on share.streamlit.io.")
+    st.stop()
+if not st.session_state.get("instr_ok"):
+    tries = st.session_state.get("instr_tries", 0)
+    if tries >= 5:
+        st.error("Too many wrong attempts. Close this tab and open the page again.")
+        st.stop()
+    with st.form("pw"):
+        pw = st.text_input("Instructor password", type="password")
+        if st.form_submit_button("Unlock", type="primary"):
+            if hmac.compare_digest(pw.encode(), PASSWORD.encode()):
+                st.session_state.instr_ok = True
+                st.session_state.pop("instr_tries", None)
+                st.rerun()
+            else:
+                st.session_state.instr_tries = tries + 1
+                st.error("Wrong password.")
+    st.stop()
+
+if st.button("Lock this page"):
+    st.session_state.instr_ok = False
+    st.rerun()
 
 with st.expander("Research configuration status", expanded=not cfg.active):
     if cfg.active:
@@ -36,27 +80,12 @@ with st.expander("Research configuration status", expanded=not cfg.active):
                 "`enabled = false`). Students can use the Learning Lab; nothing is stored. See "
                 "`docs/research/SETUP.md` to turn it on after IRB approval.")
 
-pw_needed = bool(cfg.instructor_password)
-if pw_needed and not st.session_state.get("instr_ok"):
-    with st.form("pw"):
-        pw = st.text_input("Instructor password", type="password")
-        if st.form_submit_button("Unlock"):
-            if pw == cfg.instructor_password:
-                st.session_state.instr_ok = True
-                st.rerun()
-            else:
-                st.error("Wrong password.")
-    st.stop()
-
 src = st.radio("Data source", ["Collected data", "Synthetic preview (fake data)"], horizontal=True,
-               index=0 if (cfg.active and pw_needed) else 1,
+               index=0 if cfg.active else 1,
                help="The synthetic preview shows what the dashboard will look like, using simulated students.")
 if src.startswith("Collected"):
     if not cfg.active:
         st.warning("Research collection is not active, so there is no collected data.")
-        st.stop()
-    if not pw_needed:
-        st.error("Set `instructor_password` in the research secrets to view collected data.")
         st.stop()
     try:
         with st.spinner("Loading events…"):
@@ -66,20 +95,26 @@ if src.startswith("Collected"):
         st.stop()
 else:
     n = st.slider("Synthetic students", 10, 200, 40, 10)
-    events = RA.synthetic_events(n, seed=1)
+    events = _synthetic(n)
     st.warning("⚠️ **Synthetic data.** Every number below is simulated and must not be reported as a finding.")
 
 if not events:
     st.info("No events yet.")
     st.stop()
 
-ev = RA.to_frame(events)
-courses = sorted(ev["course_code"].dropna().unique())
+
+
+@st.cache_data(show_spinner="Analysing…", max_entries=20)
+def _tables(events: list[dict], pick: tuple[str, ...]):
+    ev = RA.to_frame(events)
+    ev = ev[ev["course_code"].isin(pick)]
+    P = RA.participants(ev)
+    return ev, RA.experiments(ev), P, RA.summary(P), RA.items(ev)
+
+
+courses = sorted({e.get("course_code") or "" for e in events})
 pick = st.multiselect("Course sections", courses, default=courses)
-ev = ev[ev["course_code"].isin(pick)]
-P = RA.participants(ev)
-S = RA.summary(P)
-I = RA.items(ev)  # noqa: E741
+ev, X, P, S, I = _tables(events, tuple(pick))  # noqa: E741
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Participants", S["participants"])
@@ -90,7 +125,55 @@ c3.metric("Class normalized gain ⟨g⟩", f"{cc.get('class_normalized_gain', np
 c4.metric("System Usability Scale", f"{S['sus_mean']:.0f}" if S.get("sus_mean") is not None else "–",
           help="0–100; about 68 is average across published studies.")
 
-t1, t2, t3, t4 = st.tabs(["Learning", "Missions (class debrief)", "Feedback", "Data & export"])
+t0, t1, t2, t3, t4 = st.tabs(["Process Lab", "Learning", "Missions (class debrief)", "Feedback", "Data & export"])
+
+with t0:
+    if X.empty:
+        st.info("No Process Lab experiments yet.")
+    else:
+        pls = S.get("processlab", {})
+        a, b, c, d = st.columns(4)
+        a.metric("Experiments", len(X), help="All runs, including re-runs with new random data.")
+        b.metric("Per student (median)", f"{pls.get('experiments_median', np.nan):.0f}")
+        ofs = pls.get("one_factor_share_mean")
+        c.metric("Changed one setting at a time", "–" if ofs is None else f"{ofs:.0%}",
+                 help="Share of a student's follow-up experiments that changed exactly one setting (a controlled "
+                      "comparison), averaged over students.")
+        d.metric("Students who replicated", f"{pls.get('replicated_share', np.nan):.0%}",
+                 help="Used 'Run it 200 times' at least once.")
+        lc = RA.experiment_learning_curve(X)
+        if len(lc) >= 2 and lc.get("pred_detect_correct") is not None and lc["pred_detect_correct"].notna().any():
+            fig, ax = plt.subplots(figsize=(9, 3.2))
+            _style(ax)
+            ax.plot(lc.index, lc["pred_detect_correct"], color=SERIES, lw=2.2, marker="o", label="predicted detection correctly")
+            if "pred_delay_log_error" in lc and lc["pred_delay_log_error"].notna().any():
+                ax2 = ax.twinx()
+                ax2.plot(lc.index, lc["pred_delay_log_error"], color=SERIES_2, lw=2.2, marker="s",
+                         label="delay prediction error |log(pred/actual)|")
+                ax2.set_ylabel("delay error", color=SERIES_2)
+                ax2.spines["top"].set_visible(False)
+            ax.set_ylim(0, 1.05)
+            ax.set_xlabel("experiment number (each student's 1st, 2nd, ...)", color=INK_2)
+            ax.set_ylabel("share correct", color=SERIES)
+            ax.set_title("Do predictions improve with experience?", loc="left", fontsize=11, fontweight="bold",
+                         color=INK)
+            st.pyplot(fig, width="stretch")
+            plt.close(fig)
+            st.caption("Students per point: " + ", ".join(f"#{k}: {v}" for k, v in lc["students"].items()))
+        ch = pd.Series([c for v in X["changed"].dropna() for c in str(v).split(";") if c]).value_counts()
+        a, b = st.columns(2)
+        if len(ch):
+            a.markdown("**Settings students changed most**")
+            a.dataframe(ch.rename(lambda k: k.split(".")[-1]).rename("times").to_frame(), width="stretch")
+        b.markdown("**Charts used**")
+        b.dataframe(X["chart"].value_counts().rename("experiments").to_frame(), width="stretch")
+        for k_, t_ in (("delay_error_first_vs_second_half", "delay prediction error"),
+                       ("detect_accuracy_first_vs_second_half", "detection prediction accuracy")):
+            tt = pls.get(k_, {})
+            if tt.get("n", 0) >= 3:
+                st.markdown(f"**{t_.capitalize()}, first vs. second half of each student's experiments** "
+                            f"(paired, n = {tt['n']}): {tt['mean_pre']:.2f} → {tt['mean_post']:.2f}, "
+                            f"t = {tt['t']:.2f}, p = {tt['p']:.3g}, d_z = {tt['cohens_dz']:.2f}.")
 
 with t1:
     if cc.get("n", 0) >= 3:
@@ -192,14 +275,17 @@ with t3:
 with t4:
     st.markdown("Downloads are **anonymous**: participant codes are one-way hashes. Store them only where your IRB "
                 "protocol allows.")
-    a, b, c = st.columns(3)
+    a, b, c, d = st.columns(4)
     a.download_button("Events (CSV)", ev.to_csv(index=False).encode(), "learning_lab_events.csv", "text/csv")
     b.download_button("Participants (CSV)", P.to_csv().encode(), "learning_lab_participants.csv", "text/csv")
+    d.download_button("Experiments (CSV)", X.to_csv(index=False).encode(), "process_lab_experiments.csv", "text/csv",
+                      help="One row per Process Lab experiment: design, prediction, outcome.")
     xb = io.BytesIO()
     with pd.ExcelWriter(xb, engine="openpyxl") as xw:
         P.assign(first_seen=P["first_seen"].astype(str), last_seen=P["last_seen"].astype(str)).to_excel(
             xw, sheet_name="participants")
         I.to_excel(xw, sheet_name="concept_items")
+        X.assign(ts_utc=X["ts_utc"].astype(str)).to_excel(xw, sheet_name="experiments", index=False)
         ev.assign(ts_utc=ev["ts_utc"].astype(str)).to_excel(xw, sheet_name="events", index=False)
         pd.DataFrame([{"key": k, "value": json.dumps(v, default=str)} for k, v in S.items()]).to_excel(
             xw, sheet_name="summary", index=False)

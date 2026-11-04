@@ -1,10 +1,43 @@
 # Learning Lab: teaching guide
 
-The **Learning Lab** (in the app under *For students*) is a set of six short missions for senior business students. Each one puts the student in a manager's seat: they **predict** what will happen, **decide**, see the **consequences**, and **explain** them. Students need only a browser. No statistics software, no coding, no prior SPC.
+The **Learning Lab** (in the app under *For students*) lets senior business students learn quality management by experimenting. Students need only a browser. No statistics software, no coding, no prior SPC.
 
-It is designed to come *before* or *alongside* Labs 1–4. The missions build the intuition (why not blame the worker, why not adjust after every unit, why a stable process can still fail the customer); the labs then build the technical skill on the SPC Toolkit and Decision Studio.
+Its centre is the **Process Lab**. Each student sets up a process of their own, decides what goes wrong and when, chooses how to watch it, predicts what will happen and runs the experiment. Every number and chart is generated from the student's settings, so there is no fixed scenario to copy and no single right answer: students build their understanding by testing their own ideas. Six short guided missions are available as optional extras.
 
-## The six missions
+It is designed to come *before* or *alongside* Labs 1–4. The Lab builds intuition about variation, monitoring and the cost of quality; the labs then build technical skill on the SPC Toolkit and Decision Studio.
+
+## The Process Lab
+
+| Students set | Choices |
+|---|---|
+| **The process** | What is measured and its unit; target; lower and/or upper specification limit; unit-to-unit variation (σ); where the process is actually centred; units per sample (1–25); number of samples; baseline length; volume and costs |
+| **What goes wrong** | Any number of changes, each starting at a sample they choose: sudden shift in the average, gradual drift, more variation, a one-off outlier; or nothing (a control run) |
+| **How it is watched** | Shewhart chart (I-MR, X̄-R or X̄-S, chosen from the sample size), EWMA or CUSUM; signal rules (limits only, Western Electric, all Nelson rules); limits estimated from a baseline or known; whether people react to signals; EWMA λ and L, CUSUM k and h |
+| **Before each run** | A goal (or their own question), and a prediction: will the chart catch the change, after how many samples, how many false alarms, what share out of spec, why, and how confident |
+
+After each run students see what really happened (every unit, the true average and spread) next to what the chart saw (limits, signals, fixes), their prediction against the outcome, a plain-language reading, and the cost. They can re-run the same design with new random data, run it **200 times** to see the typical result, change one thing and run again, keep a note, and download all their experiments as a CSV.
+
+### Questions to give students
+
+Open questions work best: they leave the design of the experiment to the student.
+
+1. How small a shift can your chart catch within 10 samples? What would you change to catch a smaller one, and what does it cost?
+2. Does adding run rules help? Measure both sides: speed of detection and false alarms. (Use *Run it 200 times*.)
+3. A colleague says EWMA is always better than a Shewhart chart. Design experiments that show when that is true and when it is not (try an outlier, or more variation).
+4. Put a change inside the baseline period. What happens to the limits, and why does it matter for how a company sets up a chart?
+5. Make your process capable but badly monitored, and then poorly capable but perfectly monitored. Which ships more defects? What does that say about inspection versus capability?
+6. Find the cheapest way to watch your own process. Which costs drive the answer?
+7. Run the same design twice. Why are the results different, and how many runs would you trust?
+
+### Ways to run it
+
+**One 75-minute class.** Warm-up check (6 min) → a 5-minute demo of one experiment on the projector → Process Lab with two or three of the questions above (40 min) → class debrief with the Instructor page (10 min) → final check (6 min).
+
+**Assignment.** Students answer one question with at least four experiments, attach their experiments CSV, and write a one-page memo to a manager: what they tested, what they found, what they recommend.
+
+**Spread over the term.** Return to the Process Lab whenever a topic is introduced (variation and Deming, control charts, run rules, capability, cost of quality, monitoring design).
+
+## The six guided missions (optional)
 
 | Mission | Course objective | What students do | The idea they should leave with |
 |---|---|---|---|
@@ -17,19 +50,19 @@ It is designed to come *before* or *alongside* Labs 1–4. The missions build th
 
 Plus a **12-question concept check** at the start and the end (same questions, different order; answers and explanations are shown only after the final check) and a 3-minute feedback survey.
 
-## Ways to run it
+### Using the missions
 
-**One 75-minute class.** Warm-up check (6 min) → Red Beads and Signal or Noise (30 min) → class debrief (10 min) → Tampering Trap and Keep the Customer (22 min) → final check if time allows; the rest as homework.
+**As a class opener.** Red Beads and Signal or Noise take about 30 minutes together and work well before the first Process Lab session.
 
-**Spread over the term.** Warm-up check in week 1. Each mission on the day its topic is introduced (Red Beads with Deming, Signal or Noise with control charts, the funnel with process variation, Keep the Customer with capability, Where Does the Money Go with cost of quality, Be the Quality Manager near the end). Final check in the last week.
+**Spread over the term.** Each mission on the day its topic is introduced (Red Beads with Deming, Signal or Noise with control charts, the funnel with process variation, Keep the Customer with capability, Where Does the Money Go with cost of quality, Be the Quality Manager near the end). Final check in the last week.
 
 **Homework before a lecture.** Students do the mission before class; the lecture starts from their results (see below).
 
 ## Debrief with the class's own results
 
-The **Instructor** page (under *For analysts & classes*) shows class-level, anonymous results for each mission, e.g. how many students warned the worker with the most red beads, how many investigated the "tempting" noise charts, how much their own adjusting widened the spread in the funnel game. Showing the class its own numbers is the most effective debrief.
+The **Instructor** page (under *For analysts & classes*) shows class-level, anonymous results: for the Process Lab, how many experiments students ran, which settings they changed, how often they changed one thing at a time, and whether their predictions improved from one experiment to the next; for each mission, e.g. how many students warned the worker with the most red beads, how many investigated the "tempting" noise charts, how much their own adjusting widened the spread in the funnel game. Showing the class its own numbers is the most effective debrief.
 
-The page needs research collection turned on and the instructor password (see [docs/research/SETUP.md](../docs/research/SETUP.md)). Without it, the page shows a synthetic preview so you can see what it will look like.
+The whole page is locked with a password that only the app owner sets (`instructor_password` in the app's Secrets; see [docs/research/SETUP.md](../docs/research/SETUP.md)). Class results need research collection turned on; before that, the unlocked page offers a synthetic preview.
 
 Good debrief questions:
 

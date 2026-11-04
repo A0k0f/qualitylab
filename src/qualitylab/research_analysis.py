@@ -88,7 +88,7 @@ def participants(events) -> pd.DataFrame:
         if r["pre_score"] is not None and r["post_score"] is not None:
             r["gain"] = r["post_score"] - r["pre_score"]
             r["normalized_gain"] = C.normalized_gain(r["pre_score"], r["post_score"])
-        for m in ("redbeads", "signals", "funnel", "capability", "pareto", "manager"):
+        for m in ("processlab", "redbeads", "signals", "funnel", "capability", "pareto", "manager"):
             e = _last(g, mission=m, event_type="complete")
             r[f"{m}_done"] = e is not None
             r[f"{m}_minutes"] = None if e is None or pd.isna(e["latency_s"]) else float(e["latency_s"]) / 60
@@ -134,8 +134,136 @@ def participants(events) -> pd.DataFrame:
         for k, _ in C.LEARNING_ITEMS:
             e = _last(g, mission="survey", item_id=k)
             r[k] = None if e is None else float(_resp(e["response"]))
+        r.update(_processlab_measures(g))
         rows.append(r)
     return pd.DataFrame(rows).set_index("participant_id")
+
+
+# ---------------------------------------------------------------------------
+# Process Lab: one row per experiment
+# ---------------------------------------------------------------------------
+
+EXPERIMENT_COLUMNS = [
+    "participant_id", "condition", "course_code", "session_id", "exp", "ts_utc", "kind", "goal", "n_changed",
+    "changed", "setup_seconds", "chart", "rules", "limits_from", "react", "n", "samples", "baseline", "sigma",
+    "target", "lsl", "usl", "off_center", "n_process_changes", "change_kinds", "first_change_kind",
+    "first_change_at", "first_change_size_sigma", "first_change_in_baseline", "pred_detect", "pred_delay",
+    "pred_false_alarms", "pred_oos_pct", "pred_confidence", "pred_why", "pred_detect_correct",
+    "pred_delay_abs_error", "pred_delay_log_error", "pred_false_alarm_abs_error", "pred_oos_abs_error", "detected", "delay",
+    "false_alarms", "quiet_samples", "investigations", "oos_share", "cost_total", "true_cpk", "replicated",
+    "rep_detect_rate", "rep_delay_median", "rep_false_alarms_per_100", "reflection",
+]
+
+
+def experiments(events) -> pd.DataFrame:
+    """Every Process Lab experiment with its full design, the prediction, the outcome and what followed.
+
+    ``changed`` lists the settings that differ from the participant's previous experiment, so
+    experimentation strategies (e.g. changing one factor at a time) can be studied directly.
+    """
+    df = to_frame(events)
+    if df.empty:
+        return pd.DataFrame(columns=EXPERIMENT_COLUMNS)
+    d = df[(df["mission"] == "processlab") & df["step"].astype(str).str.match(r"exp\d+$")]
+    rows = []
+    for (pid, sess, step), g in d.groupby(["participant_id", "session_id", "step"], sort=False):
+        setup = g[g["event_type"] == "decision"]
+        if setup.empty:
+            continue
+        e0 = setup.iloc[-1]
+        cfg_ = _resp(e0["response"]) or {}
+        det = _resp(e0["detail"]) or {}
+        P, Mo, ch = cfg_.get("process", {}), cfg_.get("monitor", {}), cfg_.get("changes", [])
+        first = min(ch, key=lambda c: c["at"]) if ch else None
+        r = dict(participant_id=pid, condition=e0["condition"], course_code=e0["course_code"], session_id=sess,
+                 exp=int(str(step)[3:]), ts_utc=e0["ts_utc"], kind=det.get("kind"), goal=det.get("goal"),
+                 n_changed=det.get("n_changed"), changed=";".join(det.get("changed", [])),
+                 setup_seconds=e0["latency_s"], chart=Mo.get("chart"), rules=Mo.get("rules"),
+                 limits_from=Mo.get("limits_from"), react=Mo.get("react"), n=P.get("n"), samples=P.get("samples"),
+                 baseline=P.get("baseline"), sigma=P.get("sigma"), target=P.get("target"), lsl=P.get("lsl"),
+                 usl=P.get("usl"), off_center=P.get("mean") is not None, n_process_changes=len(ch),
+                 change_kinds=";".join(c["kind"] for c in ch),
+                 first_change_kind=None if first is None else first["kind"],
+                 first_change_at=None if first is None else first["at"],
+                 first_change_size_sigma=(None if first is None or first["kind"] == "spread" or not P.get("sigma")
+                                          else first["size"] / P["sigma"]),
+                 first_change_in_baseline=None if first is None else first["at"] <= P.get("baseline", 0))
+        pe = g[g["event_type"] == "prediction"]
+        if len(pe):
+            pr, sc = _resp(pe.iloc[-1]["response"]) or {}, _resp(pe.iloc[-1]["detail"]) or {}
+            r.update(pred_detect=pr.get("detect"), pred_delay=pr.get("delay"), pred_false_alarms=pr.get("false_alarms"),
+                     pred_oos_pct=pr.get("oos_pct"), pred_confidence=pe.iloc[-1]["confidence"],
+                     pred_why=(pr.get("why") or None), pred_detect_correct=sc.get("detect_correct"),
+                     pred_delay_abs_error=sc.get("delay_abs_error"), pred_delay_log_error=sc.get("delay_log_error"),
+                     pred_false_alarm_abs_error=sc.get("false_alarm_abs_error"),
+                     pred_oos_abs_error=sc.get("oos_abs_error_pct_points"))
+        re_ = g[g["event_type"] == "result"]
+        if len(re_):
+            res = _resp(re_.iloc[-1]["response"]) or {}
+            fc = None
+            if res.get("changes"):
+                fc = min(res["changes"], key=lambda c: c["at"])
+            r.update(detected=None if fc is None else fc["detected"], delay=None if fc is None else fc["delay"],
+                     false_alarms=res.get("false_alarms"), quiet_samples=res.get("quiet_samples"),
+                     investigations=res.get("investigations"), oos_share=res.get("oos_share"),
+                     cost_total=(res.get("costs") or {}).get("total"),
+                     true_cpk=(res.get("capability") or {}).get("true_cpk"))
+        rp = g[g["event_type"] == "replicate"]
+        r["replicated"] = bool(len(rp))
+        if len(rp):
+            rr = _resp(rp.iloc[-1]["response"]) or {}
+            fc = (rr.get("changes") or [None])[0]
+            r.update(rep_detect_rate=None if not fc else fc.get("detected"),
+                     rep_delay_median=None if not fc else fc.get("delay_median"),
+                     rep_false_alarms_per_100=rr.get("false_alarms_per_100"))
+        tx = g[g["event_type"] == "text"]
+        r["reflection"] = _resp(tx.iloc[-1]["response"]) if len(tx) else None
+        rows.append(r)
+    out = pd.DataFrame(rows).reindex(columns=EXPERIMENT_COLUMNS)
+    return out.sort_values(["participant_id", "ts_utc", "exp"]).reset_index(drop=True)
+
+
+def _processlab_measures(g: pd.DataFrame) -> dict:
+    x = experiments(g)
+    r: dict = dict(pl_experiments=len(x) or None)
+    if x.empty:
+        return r
+    new = x[x["kind"] == "new"]
+    follow = new[new["n_changed"].notna() & (new["n_changed"] > 0)]
+    changed = {c for v in x["changed"].dropna() for c in str(v).split(";") if c}
+    half = len(x) // 2
+
+    def mean(col, part):
+        v = pd.to_numeric(part[col], errors="coerce").dropna()
+        return float(v.mean()) if len(v) else None
+
+    first, second = x.iloc[:max(half, 1)], x.iloc[max(half, 1):]
+    r.update(pl_new=len(new), pl_reruns=int((x["kind"] == "rerun").sum()), pl_replications=int(x["replicated"].sum()),
+             pl_one_factor_share=float((follow["n_changed"] == 1).mean()) if len(follow) else None,
+             pl_factors_explored=len(changed), pl_charts_tried=int(x["chart"].nunique()),
+             pl_notes=int(x["reflection"].notna().sum()),
+             pl_detect_acc_first_half=mean("pred_detect_correct", first),
+             pl_detect_acc_second_half=mean("pred_detect_correct", second),
+             # |log(predicted / actual delay)|: 0 = exact, 0.69 = off by a factor of 2 (scale-free)
+             pl_delay_err_first_half=mean("pred_delay_log_error", first),
+             pl_delay_err_second_half=mean("pred_delay_log_error", second),
+             pl_fa_err_first_half=mean("pred_false_alarm_abs_error", first),
+             pl_fa_err_second_half=mean("pred_false_alarm_abs_error", second))
+    return r
+
+
+def experiment_learning_curve(x: pd.DataFrame, max_k: int = 12) -> pd.DataFrame:
+    """Class means of prediction errors by experiment number (1st, 2nd, ... experiment of each student)."""
+    if x.empty:
+        return pd.DataFrame()
+    x = x.copy()
+    x["k"] = x.groupby("participant_id").cumcount() + 1
+    x = x[x["k"] <= max_k]
+    agg = {c: "mean" for c in ("pred_detect_correct", "pred_delay_log_error", "pred_false_alarm_abs_error",
+                               "pred_oos_abs_error") if c in x}
+    t = x.groupby("k").agg(agg)
+    t["students"] = x.groupby("k")["participant_id"].nunique()
+    return t
 
 
 def items(events) -> pd.DataFrame:
@@ -286,6 +414,19 @@ def summary(p: pd.DataFrame) -> dict:
                                                t=float(t.statistic), p=float(t.pvalue),
                                                cohens_d=float((v1.mean() - v2.mean()) / sp) if sp > 0 else np.nan)
             out["post_condition_ancova"] = ancova(p, c1, c2)
+    if "pl_experiments" in p and p["pl_experiments"].notna().any():
+        e = p["pl_experiments"].dropna()
+        out["processlab"] = dict(students=int(len(e)), experiments_mean=float(e.mean()),
+                                 experiments_median=float(e.median()),
+                                 one_factor_share_mean=float(p["pl_one_factor_share"].mean())
+                                 if p["pl_one_factor_share"].notna().any() else None,
+                                 replicated_share=float((p["pl_replications"].fillna(0) > 0)[e.index].mean()))
+        if {"pl_delay_err_first_half", "pl_delay_err_second_half"} <= set(p.columns):
+            out["processlab"]["delay_error_first_vs_second_half"] = paired_test(
+                p["pl_delay_err_first_half"], p["pl_delay_err_second_half"])
+        if {"pl_detect_acc_first_half", "pl_detect_acc_second_half"} <= set(p.columns):
+            out["processlab"]["detect_accuracy_first_vs_second_half"] = paired_test(
+                p["pl_detect_acc_first_half"], p["pl_detect_acc_second_half"])
     if "sus" in p:
         out["sus_mean"] = float(p["sus"].mean()) if p["sus"].notna().any() else None
     return out
@@ -380,9 +521,80 @@ def synthetic_events(n: int = 40, seed: int = 0, conditions=("predict", "no_pred
                 continue
             ev(mission="survey", step="learning", event_type="answer", item_id=k,
                response=int(np.clip(round(rng.normal(4, 0.8)), 1, 5)))
+        _synthetic_processlab(ev, rng, ability, cond)
         if rng.random() < 0.3:
             ev(mission="survey", step="open", event_type="text", item_id="most_helpful",
                response=str(rng.choice(["(synthetic) The funnel game surprised me.",
                                         "(synthetic) Red beads: the workers were not the problem.",
                                         "(synthetic) Choosing projects by cost, not count."])))
     return out
+
+
+def _synthetic_processlab(ev, rng, ability: float, cond: str) -> None:
+    """Fake Process Lab sessions: real simulations of plausible, evolving experiment designs."""
+    from .learn import process_lab as PL
+
+    exp = PL.Experiment(PL.Process(), [PL.Change("shift", 35, float(rng.choice([0.5, 1.0, 1.5])))], PL.Monitor())
+    prev = None
+    careful = 1 / (1 + np.exp(-ability))          # more able students vary one factor at a time more often
+    n_exp = int(rng.integers(2, 6) + round(3 * careful))
+    ev(mission="processlab", step="start", event_type="start")
+    for k in range(1, n_exp + 1):
+        kind = "new"
+        if k > 1 and rng.random() < 0.15:
+            kind = "rerun"
+        elif k > 1:
+            d = exp.to_dict()
+            moves = int(1 if rng.random() < 0.35 + 0.5 * careful else rng.integers(2, 4))
+            for _ in range(moves):
+                f = rng.choice(["n", "chart", "rules", "size", "limits", "react"])
+                if f == "n":
+                    d["process"]["n"] = int(rng.choice([1, 2, 3, 5, 8]))
+                elif f == "chart":
+                    d["monitor"]["chart"] = str(rng.choice(["shewhart", "ewma", "cusum"]))
+                elif f == "rules":
+                    d["monitor"]["rules"] = str(rng.choice(list(PL.RULE_SETS)))
+                elif f == "size":
+                    d["changes"][0]["size"] = float(rng.choice([0.25, 0.5, 1.0, 1.5, 2.0]))
+                elif f == "limits":
+                    d["monitor"]["limits_from"] = str(rng.choice(["baseline", "known"]))
+                else:
+                    d["monitor"]["react"] = bool(rng.random() < 0.8)
+            exp = PL.Experiment.from_dict(d)
+        d = exp.to_dict()
+        changed = PL.diff(prev, d)
+        seed = int(rng.integers(1, 2**31 - 1))
+        ev(mission="processlab", step=f"exp{k}", event_type="decision", response=d,
+           latency_s=float(rng.gamma(4, 15)),
+           detail=dict(kind=kind, changed=changed, n_changed=len(changed), goal="explore", seed=seed))
+        r = PL.run(exp, seed, keep_data=False)
+        o = r["changes"][0]
+        if cond != "no_predict":
+            skill = 0.55 + 0.35 * (1 - np.exp(-(k - 1) / 3)) * careful   # predictions improve with experience
+            det = o["detected"] if rng.random() < skill else not o["detected"]
+            delay = max(1, int(round((o["delay"] or 10) * np.exp(rng.normal(0, 1.1 - 0.7 * skill))))) if det else None
+            fa = max(0, int(round(r["false_alarms"] + rng.normal(0, 2.5 - 1.5 * skill))))
+            pred = dict(detect="Yes" if det else "No", delay=delay, false_alarms=fa,
+                        oos_pct=round(max(0.0, 100 * r["oos_share"] * np.exp(rng.normal(0, 1))), 3), why="")
+            sc = dict(detect_correct=bool(det == o["detected"]), false_alarm_abs_error=abs(fa - r["false_alarms"]),
+                      oos_abs_error_pct_points=abs(pred["oos_pct"] - 100 * r["oos_share"]))
+            if det and o["detected"]:
+                sc["delay_abs_error"] = abs(delay - o["delay"])
+                sc["delay_log_error"] = abs(float(np.log(delay / o["delay"])))
+            ev(mission="processlab", step=f"exp{k}", event_type="prediction", response=pred,
+               confidence=int(np.clip(round(3 + ability + rng.normal(0, 1)), 1, 5)), correct=sc["detect_correct"],
+               score=sc.get("delay_abs_error"), detail=sc)
+        ev(mission="processlab", step=f"exp{k}", event_type="result", score=r["costs"]["total"],
+           response=dict(changes=r["changes"], false_alarms=r["false_alarms"], quiet_samples=r["quiet_samples"],
+                         investigations=r["investigations"], oos_share=r["oos_share"], costs=r["costs"],
+                         capability=r["capability"], chart=r["chart_name"]))
+        if rng.random() < 0.15 + 0.3 * careful:
+            rep = PL.replicate(exp, reps=30, seed=seed)
+            ev(mission="processlab", step=f"exp{k}", event_type="replicate", score=rep["cost"],
+               response={kk: v for kk, v in rep.items() if kk != "changes"}
+               | dict(changes=[{kk: v for kk, v in c.items() if kk != "delays"} for c in rep["changes"]]))
+        if rng.random() < 0.2:
+            ev(mission="processlab", step=f"exp{k}", event_type="text", item_id="PL_REFLECT",
+               response="(synthetic) A bigger sample caught the shift sooner.")
+        prev = d
+    ev(mission="processlab", step="end", event_type="complete", latency_s=float(rng.normal(1500, 400)))

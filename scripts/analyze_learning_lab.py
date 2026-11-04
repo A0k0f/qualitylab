@@ -11,6 +11,8 @@ Input: the raw events exported from the Instructor page (CSV), downloaded from t
 
 Output (in --out):
     participants.csv   one row per participant with every measure (see docs/research/DATA_DICTIONARY.md)
+    experiments.csv    one row per Process Lab experiment: design, what changed since the last one,
+                       prediction, outcome, replication and note
     items.csv          each concept-check question: share correct before and after
     calibration.csv    mean confidence on correct vs. incorrect answers, before and after
     summary.json       paired tests, effect sizes, condition comparison
@@ -34,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from qualitylab import research_analysis as RA  # noqa: E402
 from qualitylab.learn import concepts as C  # noqa: E402
 
-MISSIONS = ("redbeads", "signals", "funnel", "capability", "pareto", "manager")
+MISSIONS = ("processlab", "redbeads", "signals", "funnel", "capability", "pareto", "manager")
 
 
 def load(path: Path) -> pd.DataFrame:
@@ -58,7 +60,8 @@ def _p(x):
     return "< .001" if x < 0.001 else f"{x:.3f}".lstrip("0")
 
 
-def report(p: pd.DataFrame, it: pd.DataFrame, cal: pd.DataFrame, s: dict, label: str) -> str:
+def report(p: pd.DataFrame, it: pd.DataFrame, cal: pd.DataFrame, s: dict, label: str,
+           x: pd.DataFrame | None = None) -> str:
     L = [f"# Learning Lab results: {label}", ""]
     n = s.get("participants", 0)
     L.append(f"**Participants:** {n}. ")
@@ -73,7 +76,7 @@ def report(p: pd.DataFrame, it: pd.DataFrame, cal: pd.DataFrame, s: dict, label:
 
     c = s.get("concept", {})
     if c.get("n", 0) >= 3:
-        L += ["## RQ1 · Concept check (12 items)", "",
+        L += ["## Concept check, 12 items (RQ1)", "",
               f"Participants with both checks: **{c['n']}**. Mean score rose from **{c['mean_pre']:.0%}** to "
               f"**{c['mean_post']:.0%}** (change {c['mean_diff'] * 100:+.1f} pts, 95 % CI {c['mean_diff_ci95'][0] * 100:+.1f} "
               f"to {c['mean_diff_ci95'][1] * 100:+.1f}). Paired t({c['n'] - 1}) = {_f(c['t'])}, p {_p(c['p'])}; "
@@ -86,7 +89,7 @@ def report(p: pd.DataFrame, it: pd.DataFrame, cal: pd.DataFrame, s: dict, label:
                      f"| {_f(r['change'] * 100, 0)} pts |")
         L.append("")
     if "gain_by_condition" in s:
-        L += ["## RQ2 · Predict vs. no predict", ""]
+        L += ["## Predict vs. no predict (RQ4)", ""]
         L += [f"* {k}: n = {v['n']}, mean gain {_f(v['mean'] * 100, 1)} pts" for k, v in s["gain_by_condition"].items()]
         w = s.get("gain_condition_welch")
         if w:
@@ -99,7 +102,31 @@ def report(p: pd.DataFrame, it: pd.DataFrame, cal: pd.DataFrame, s: dict, label:
                      f"{_f(a['ci95'][1] * 100, 1)}, p {_p(a['p'])}")
         L.append("")
 
-    L += ["## RQ3 · Decisions inside the missions", ""]
+    pl = s.get("processlab")
+    if pl and x is not None and len(x):
+        L += ["## Process Lab: how students experiment (RQ2, RQ3)", "",
+              f"{len(x)} experiments by {pl['students']} students (median {pl['experiments_median']:.0f} each). "
+              f"Share of follow-up experiments that changed exactly one setting (mean over students): "
+              f"{_f(pl.get('one_factor_share_mean'))}. Students who replicated an experiment: "
+              f"{pl['replicated_share']:.0%}.", ""]
+        for key, name in (("detect_accuracy_first_vs_second_half", "Detection predictions correct"),
+                          ("delay_error_first_vs_second_half", "Delay prediction error |log(pred/actual)|")):
+            t = pl.get(key, {})
+            if t.get("n", 0) >= 3:
+                L.append(f"* {name}, first vs. second half of each student's experiments: {_f(t['mean_pre'])} → "
+                         f"{_f(t['mean_post'])} (n = {t['n']}, paired t p {_p(t['p'])}, d_z = {_f(t['cohens_dz'])})")
+        lc = RA.experiment_learning_curve(x)
+        if len(lc):
+            L += ["", "| Experiment # | Students | Detection prediction correct | Delay error |", "|---|---|---|---|"]
+            L += [f"| {k} | {int(r['students'])} | {_f(r.get('pred_detect_correct'))} | "
+                  f"{_f(r.get('pred_delay_log_error'))} |" for k, r in lc.iterrows()]
+        top = pd.Series([c for v in x["changed"].dropna() for c in str(v).split(";") if c]).value_counts().head(6)
+        if len(top):
+            L += ["", "Settings changed most often: " + ", ".join(f"{k.split('.')[-1]} ({v})" for k, v in top.items())
+                  + "."]
+        L.append("")
+
+    L += ["## Guided missions (RQ5)", ""]
     d = s.get("signals_dprime", {})
     if d.get("n", 0) >= 3:
         L.append(f"* **Signal or Noise:** d′ went from {_f(d['mean_pre'])} in round 1 to {_f(d['mean_post'])} in round 2 "
@@ -125,14 +152,14 @@ def report(p: pd.DataFrame, it: pd.DataFrame, cal: pd.DataFrame, s: dict, label:
           f"{med('mg_first_regret_pct', '{:.0%}')}, of the best plan tried {med('mg_best_regret_pct', '{:.0%}')}.", ""]
 
     if len(cal):
-        L += ["## RQ4 · Confidence calibration", "", "Mean confidence (1–5) on correct and incorrect answers:", "",
+        L += ["## Confidence calibration (RQ6)", "", "Mean confidence (1–5) on correct and incorrect answers:", "",
               "| Check | Correct | Incorrect |", "|---|---|---|"]
         L += [f"| {k} | {_f(r.get('correct'))} | {_f(r.get('incorrect'))} |" for k, r in cal.iterrows()]
         L.append("")
 
     if s.get("sus_mean") is not None:
         lk = [f"{k} {_f(p[k].mean())}" for k, _ in C.LEARNING_ITEMS if k in p and p[k].notna().any()]
-        L += ["## RQ5 · Experience", "",
+        L += ["## Experience (RQ7)", "",
               f"System Usability Scale: mean **{_f(s['sus_mean'], 1)}** (n = {int(p['sus'].notna().sum())}; "
               "68 is the usual average). Perceived learning items (1–5): " + ", ".join(lk) + ".", ""]
     L += ["---", "Generated by `scripts/analyze_learning_lab.py`. Definitions: `docs/research/DATA_DICTIONARY.md`."]
@@ -168,6 +195,8 @@ def main(argv=None) -> int:
     s = RA.summary(p)
     a.out.mkdir(parents=True, exist_ok=True)
     p.to_csv(a.out / "participants.csv")
+    x = RA.experiments(ev)
+    x.to_csv(a.out / "experiments.csv", index=False)
     it.to_csv(a.out / "items.csv", index_label="item_id")
     cal.to_csv(a.out / "calibration.csv")
     (a.out / "summary.json").write_text(json.dumps(s, indent=2, default=lambda x: None if x != x else x))
@@ -175,9 +204,9 @@ def main(argv=None) -> int:
     txt = df[df["event_type"] == "text"][["participant_id", "condition", "mission", "item_id", "response"]].copy()
     txt["response"] = txt["response"].map(RA._resp)
     txt.to_csv(a.out / "open_responses.csv", index=False)
-    (a.out / "report.md").write_text(report(p, it, cal, s, label), encoding="utf-8")
+    (a.out / "report.md").write_text(report(p, it, cal, s, label, x), encoding="utf-8")
     print(f"{len(p)} participants, {len(df)} events → {a.out}/")
-    print((a.out / "report.md").read_text(encoding="utf-8").split("## RQ4")[0][:1500])
+    print((a.out / "report.md").read_text(encoding="utf-8").split("## Predict vs.")[0][:2500])
     return 0
 
 

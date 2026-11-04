@@ -40,6 +40,8 @@ The sheet gets a tab called `events` the first time data arrive. One row is one 
 Open the app on [share.streamlit.io](https://share.streamlit.io), click **⋮ → Settings → Secrets**, and paste the block from [`secrets.example.toml`](secrets.example.toml), filled in:
 
 ```toml
+instructor_password = "a password you choose"
+
 [research]
 enabled = true
 study_title = "Learning quality management with interactive simulations"
@@ -54,7 +56,6 @@ webhook_url = "the Web app URL from step 1"
 webhook_token = "the same token you put in the Apps Script"
 salt = "another random string from the command above"
 conditions = ["predict", "no_predict"]
-instructor_password = "a password you choose"
 ```
 
 Save. The app restarts within a minute.
@@ -69,7 +70,7 @@ What each setting does:
 | `course_code` | Stamped on every row so several sections or semesters can share one sheet. Change it each term. |
 | `salt` | Secret used to scramble the anonymous codes. **Never change it during a study**: the same student would get a different code and pre/post answers would no longer link. Never share it. |
 | `conditions` | Optional experiment. Each participant is assigned to one condition by their code, so they keep it across sessions. `no_predict` hides the "predict first" steps. Remove the line for a single-group study. |
-| `instructor_password` | Unlocks the collected data on the **Instructor** page. Without it the page shows only a synthetic preview. |
+| `instructor_password` | Top-level line, above `[research]`. Locks the whole **Instructor** page; without it the page stays locked for everyone. |
 | `data_access_note` | Optional. Replaces the default sentence on the consent screen about who sees the data and when. It must match your approved protocol. |
 
 The Instructor page has a **Configuration** box that lists anything missing. If a required setting is wrong, collection stays off and the app keeps working normally.

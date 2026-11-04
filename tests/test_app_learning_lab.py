@@ -176,6 +176,9 @@ def play_everything(at, letters: str) -> None:
     p.click("Finish mission")
     p.click("← Back to all missions")
 
+    # process lab: three experiments (new, re-run, one setting changed), a replication and a note
+    play_process_lab(at, predicting)
+
     # final check and survey
     p.key("go_post")
     for it in C.ITEMS:
@@ -192,6 +195,40 @@ def play_everything(at, letters: str) -> None:
     p.click("Submit feedback")
 
 
+def play_process_lab(at, predicting: bool) -> None:
+    p = Player(at)
+    p.key("go_processlab")
+    at.selectbox(key="pl_example").set_value("Filling bottles (oz)").run()
+    at.selectbox(key="pl_new_kind").set_value("shift").run()
+    p.click("➕ Add this change")
+    assert at.number_input(key="pl_c_size_1").value == pytest.approx(0.04)
+
+    def predict(k):
+        if predicting:
+            at.radio(key=f"pl_p_det_{k}").set_value("Yes")
+            at.number_input(key=f"pl_p_delay_{k}").set_value(4)
+            at.number_input(key=f"pl_p_fa_{k}").set_value(1)
+            at.number_input(key=f"pl_p_oos_{k}").set_value(0.1)
+        else:
+            assert not [r for r in at.radio if r.key and r.key.startswith("pl_p_")]
+
+    predict(1)
+    p.click("▶ Run experiment")
+    assert any(m.label == "False alarms" for m in at.metric)
+    p.click("📊 Run it 200 times")
+    assert any(m.label.startswith("False alarms per 100") for m in at.metric)
+    p.click("🔁 Same settings")
+    at.slider(key="pl_n").set_value(8).run()
+    predict(3)
+    p.click("▶ Run experiment")
+    [t for t in at.text_area if t.label.startswith("What did this experiment teach you")][0].set_value(
+        "A bigger sample caught it sooner.")
+    p.click("Save my note")
+    p.click("✅ Finish Process Lab")
+    assert "processlab" in at.session_state["lab"]["done"]
+    p.click("← Learning Lab")
+
+
 @pytest.mark.parametrize("letters,condition", [("MA", "predict"), ("PA", "no_predict")])
 def test_full_learning_lab_in_research_mode(tmp_path, letters, condition):
     log = tmp_path / "events.jsonl"
@@ -205,7 +242,7 @@ def test_full_learning_lab_in_research_mode(tmp_path, letters, condition):
 
     lab = at.session_state["lab"]
     assert lab["condition"] == condition
-    assert set(lab["done"]) == {"redbeads", "signals", "funnel", "capability", "pareto", "manager"}
+    assert set(lab["done"]) == {"processlab", "redbeads", "signals", "funnel", "capability", "pareto", "manager"}
     assert lab["post"]["score"] == 12 and lab["pre"]["score"] == 9
 
     cfg = research.ResearchConfig.from_mapping(dict(at.secrets["research"]))
@@ -218,7 +255,15 @@ def test_full_learning_lab_in_research_mode(tmp_path, letters, condition):
 
     p = research_analysis.participants(events).iloc[0]
     assert p["pre_score"] == pytest.approx(0.75) and p["post_score"] == 1.0
-    assert all(p[f"{m}_done"] for m in ("redbeads", "signals", "funnel", "capability", "pareto", "manager"))
+    assert all(p[f"{m}_done"] for m in ("processlab", "redbeads", "signals", "funnel", "capability", "pareto",
+                                         "manager"))
+    x = research_analysis.experiments(events)
+    assert list(x["exp"]) == [1, 2, 3] and list(x["kind"]) == ["new", "rerun", "new"]
+    assert x.loc[2, "changed"] == "process.n" and x.loc[2, "n"] == 8 and x.loc[0, "replicated"]
+    assert x.loc[2, "reflection"] == "A bigger sample caught it sooner."
+    assert x["detected"].notna().all() and x["cost_total"].gt(0).all()
+    assert (x["pred_detect"].notna().sum() > 0) == (condition == "predict")
+    assert p["pl_experiments"] == 3 and p["pl_one_factor_share"] == 1.0 and p["pl_replications"] == 1
     assert p["rb_system_cause"] and p["rb_chose_supplier"] and p["cap_found_cheapest"]
     assert p["pg_first_share_of_optimal"] < 1 and p["pg_best_share_of_optimal"] == pytest.approx(1)
     assert p["mg_best_regret_pct"] == pytest.approx(0)
@@ -247,3 +292,26 @@ def test_no_research_config_means_no_consent_screen():
     assert not at.exception
     assert any(t.value.endswith("Learning Lab") for t in at.title)
     assert not any("research study" in s.value for s in at.subheader)
+
+
+INSTRUCTOR = str(Path(__file__).resolve().parents[1] / "app" / "views" / "instructor.py")
+
+
+def test_instructor_page_is_locked_without_a_password():
+    at = AppTest.from_file(INSTRUCTOR, default_timeout=120)
+    at.run()
+    assert not at.exception
+    assert not at.tabs and not at.metric and not at.radio, "nothing but the lock notice may show"
+
+
+def test_instructor_page_needs_the_right_password():
+    at = AppTest.from_file(INSTRUCTOR, default_timeout=120)
+    at.secrets["instructor_password"] = "correct horse"
+    at.run()
+    assert not at.tabs
+    at.text_input[0].set_value("wrong")
+    at.button[0].click().run()
+    assert not at.tabs and any("Wrong password" in e.value for e in at.error)
+    at.text_input[0].set_value("correct horse")
+    at.button[0].click().run()
+    assert not at.exception and len(at.tabs) == 5

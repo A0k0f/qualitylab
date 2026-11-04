@@ -11,6 +11,7 @@ from .core import (
     complete_mission,
     confidence,
     esc,
+    fig_png,
     go,
     header,
     insight,
@@ -25,6 +26,12 @@ from .core import (
 
 M = "signals"
 STEPS = ["The game", "Round 1: your instinct", "What the experts look for", "Round 2: with the rules", "Results"]
+
+
+@st.cache_data(max_entries=4000, show_spinner=False)
+def _chart_png(round_dict: dict, zones: bool, reveal: bool) -> bytes:
+    """Charts are re-shown on every click; draw each one once."""
+    return fig_png(LP.signal_chart(S.Round(**round_dict), zones=zones, reveal=reveal).figure)
 
 
 def _phase_rounds(s, phase: str):
@@ -47,7 +54,7 @@ def _play(s, phase: str, zones: bool) -> bool:
     a.markdown(f"**Chart {idx + 1} of {len(rounds)}** · {esc(r.context['story'])}")
     b.metric("Your money so far", f"${money:,}")
     answered = len(res) > idx
-    show(LP.signal_chart(r, zones=zones, reveal=answered).figure)
+    st.image(_chart_png(s[f"rounds_{phase}"][idx], zones, answered), width="stretch")
     if not answered:
         shown(f"sig_{r.round_id}")
         with st.form(f"sig_{r.round_id}"):
